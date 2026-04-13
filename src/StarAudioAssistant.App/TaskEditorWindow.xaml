@@ -1,0 +1,72 @@
+﻿<Window x:Class="StarAudioAssistant.App.TaskEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="任务编辑"
+        Width="520"
+        Height="470"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#F9FBFF">
+    <Border Margin="14" CornerRadius="10" Background="White" BorderBrush="#D7E0EC" BorderThickness="1" Padding="14">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="任务名称" />
+            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" x:Name="NameTextBox" Margin="0,0,0,8" Height="30" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="音频文件" />
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="AudioPathTextBox" Margin="0,0,8,8" Height="30" />
+            <Button Grid.Row="1" Grid.Column="2" Content="浏览..." Padding="12,4" Click="BrowseButton_Click" />
+
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="开始" />
+            <StackPanel Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                <ComboBox x:Name="StartDayComboBox" Width="160" Margin="0,0,8,0" />
+                <TextBox x:Name="StartTimeTextBox" Width="120" />
+                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Foreground="#5C6B7F" Text="格式 HH:mm" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Text="结束" />
+            <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                <ComboBox x:Name="EndDayComboBox" Width="160" Margin="0,0,8,0" />
+                <TextBox x:Name="EndTimeTextBox" Width="120" />
+                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Foreground="#5C6B7F" Text="格式 HH:mm" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="优先级" />
+            <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" x:Name="PriorityTextBox" Margin="0,0,0,8" Height="30" />
+
+            <TextBlock Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Text="淡入/淡出" />
+            <StackPanel Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBox x:Name="FadeInTextBox" Width="120" />
+                <TextBlock Margin="8,0" VerticalAlignment="Center" Text="/" />
+                <TextBox x:Name="FadeOutTextBox" Width="120" />
+                <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Foreground="#5C6B7F" Text="单位毫秒" />
+            </StackPanel>
+
+            <CheckBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" x:Name="EnabledCheckBox" Content="启用此任务" Margin="0,0,0,10" />
+
+            <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" x:Name="ValidationTextBlock" Foreground="#B42318" Margin="0,0,0,10" />
+
+            <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="取消" Padding="16,5" Margin="0,0,8,0" IsCancel="True" />
+                <Button Content="保存" Padding="16,5" IsDefault="True" Click="SaveButton_Click" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

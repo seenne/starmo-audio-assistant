@@ -1,53 +1,319 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
-using System.Windows.Input;
+using System.Windows.Forms;
+using StarAudioAssistant.App.Models;
+using StarAudioAssistant.App.Services;
+using StarAudioAssistant.Audio.Playback;
+using StarAudioAssistant.Infrastructure.Configuration;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace StarAudioAssistant.App;
 
 public partial class MainWindow : Window
 {
-    public ObservableCollection<ScheduledTaskRow> TaskRows { get; } =
-    [
-        new(true, "周一晨间", "Mon 06:00 -> Mon 08:00", "每周循环", "morning_focus.mp3", "1.5s / 1.5s", 100, "2026-04-20 06:00", "播放中"),
-        new(true, "周二深夜", "Tue 23:00 -> Wed 05:00", "跨天循环", "night_guard.mp3", "1.5s / 1.5s", 100, "2026-04-14 23:00", "等待中"),
-        new(true, "午间提醒", "Mon-Fri 12:20 -> 12:35", "工作日", "lunch_chime.mp3", "1.0s / 1.0s", 80, "2026-04-13 12:20", "等待中"),
-        new(false, "备用播报", "Sat 09:00 -> Sat 10:00", "每周循环", "backup_voice.mp3", "2.0s / 2.0s", 60, "2026-04-18 09:00", "已停用")
-    ];
+    private readonly ObservableCollection<TaskDefinition> _taskRows = [];
+    private readonly JsonConfigurationStore _configStore = new();
+    private readonly SchedulerOrchestrator _scheduler;
+    private readonly NotifyIcon _notifyIcon;
+    private bool _allowClose;
 
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = this;
+
+        TaskGrid.ItemsSource = _taskRows;
+        _scheduler = new SchedulerOrchestrator(GetTaskSnapshot, new NaudioPlaybackService());
+        _scheduler.SnapshotUpdated += OnSchedulerSnapshotUpdated;
+
+        _notifyIcon = new NotifyIcon
+        {
+            Icon = System.Drawing.SystemIcons.Information,
+            Visible = true,
+            Text = "星辰音频助手"
+        };
+
+        _notifyIcon.DoubleClick += (_, _) => RestoreFromTray();
+        _notifyIcon.ContextMenuStrip = BuildTrayMenu();
     }
 
-    private void MinimizeToTrayButton_Click(object sender, RoutedEventArgs e)
+    private async void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        WindowState = WindowState.Minimized;
+        var config = await _configStore.LoadAsync();
+        var loaded = TaskDefinitionMapper.ToTaskDefinitions(config);
+
+        if (loaded.Count == 0)
+        {
+            loaded = BuildDefaultTasks();
+        }
+
+        ReplaceTasks(loaded);
+        await PersistAsync();
+
+        _scheduler.Start();
     }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    private async void Window_Closing(object? sender, CancelEventArgs e)
     {
-        Close();
+        if (!_allowClose)
+        {
+            e.Cancel = true;
+            HideToTray();
+            return;
+        }
+
+        _notifyIcon.Visible = false;
+        _notifyIcon.Dispose();
+        await _scheduler.DisposeAsync();
     }
 
-    private void TaskGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private void MinimizeToTrayButton_Click(object sender, RoutedEventArgs e) => HideToTray();
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e) => HideToTray();
+
+    private async void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
-        if (TaskGrid.SelectedItem is not ScheduledTaskRow selected)
+        var editor = new TaskEditorWindow(null) { Owner = this };
+        if (editor.ShowDialog() != true || editor.Result is null)
         {
             return;
         }
 
-        MessageBox.Show($"这里会打开任务编辑弹窗：{selected.Name}", "编辑任务", MessageBoxButton.OK, MessageBoxImage.Information);
+        editor.Result.SortOrder = _taskRows.Count;
+        _taskRows.Add(editor.Result);
+        NormalizeOrder();
+        await PersistAsync();
+        _scheduler.Refresh();
+        TaskGrid.Items.Refresh();
     }
-}
 
-public sealed record ScheduledTaskRow(
-    bool IsEnabled,
-    string Name,
-    string TimeRange,
-    string RuleType,
-    string AudioFileName,
-    string Fade,
-    int Priority,
-    string NextTrigger,
-    string Status);
+    private async void EditTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (TaskGrid.SelectedItem is not TaskDefinition selected)
+        {
+            MessageBox.Show(this, "请先选择一条任务。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var editor = new TaskEditorWindow(selected.Clone()) { Owner = this };
+        if (editor.ShowDialog() != true || editor.Result is null)
+        {
+            return;
+        }
+
+        var index = _taskRows.IndexOf(selected);
+        if (index < 0)
+        {
+            return;
+        }
+
+        editor.Result.SortOrder = selected.SortOrder;
+        _taskRows[index] = editor.Result;
+        NormalizeOrder();
+        await PersistAsync();
+        _scheduler.Refresh();
+        TaskGrid.Items.Refresh();
+    }
+
+    private async void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (TaskGrid.SelectedItem is not TaskDefinition selected)
+        {
+            MessageBox.Show(this, "请先选择一条任务。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var confirm = MessageBox.Show(this, $"确定删除任务“{selected.Name}”？", "确认", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if (confirm != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        _taskRows.Remove(selected);
+        NormalizeOrder();
+        await PersistAsync();
+        _scheduler.Refresh();
+        TaskGrid.Items.Refresh();
+    }
+
+    private async void ToggleTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (TaskGrid.SelectedItem is not TaskDefinition selected)
+        {
+            MessageBox.Show(this, "请先选择一条任务。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        selected.IsEnabled = !selected.IsEnabled;
+        selected.RuntimeStatus = selected.IsEnabled ? "等待中" : "已停用";
+
+        TaskGrid.Items.Refresh();
+        await PersistAsync();
+        _scheduler.Refresh();
+    }
+
+    private async void TestPlaybackButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (TaskGrid.SelectedItem is not TaskDefinition selected)
+        {
+            MessageBox.Show(this, "请先选择一条任务。", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        try
+        {
+            await _scheduler.PlayPreviewAsync(selected);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, $"测试播放失败：{ex.Message}", "播放异常", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void StopPlaybackButton_Click(object sender, RoutedEventArgs e)
+    {
+        await _scheduler.StopPlaybackAsync();
+    }
+
+    private void TaskGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        EditTaskButton_Click(sender, e);
+    }
+
+    private void ViewConflictButton_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(this, ConflictHintText.Text, "冲突详情", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void HideToTray()
+    {
+        Hide();
+        ShowInTaskbar = false;
+        _notifyIcon.BalloonTipTitle = "星辰音频助手";
+        _notifyIcon.BalloonTipText = "程序仍在后台运行，可从托盘恢复。";
+        _notifyIcon.ShowBalloonTip(1200);
+    }
+
+    private void RestoreFromTray()
+    {
+        Show();
+        ShowInTaskbar = true;
+        WindowState = WindowState.Normal;
+        Activate();
+    }
+
+    private ContextMenuStrip BuildTrayMenu()
+    {
+        var menu = new ContextMenuStrip();
+
+        var openItem = new ToolStripMenuItem("打开主界面");
+        openItem.Click += (_, _) => Dispatcher.Invoke(RestoreFromTray);
+
+        var stopItem = new ToolStripMenuItem("停止播放");
+        stopItem.Click += (_, _) => Dispatcher.InvokeAsync(async () => await _scheduler.StopPlaybackAsync());
+
+        var exitItem = new ToolStripMenuItem("退出");
+        exitItem.Click += (_, _) => Dispatcher.Invoke(() =>
+        {
+            _allowClose = true;
+            Close();
+        });
+
+        menu.Items.Add(openItem);
+        menu.Items.Add(stopItem);
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(exitItem);
+        return menu;
+    }
+
+    private IReadOnlyList<TaskDefinition> GetTaskSnapshot()
+    {
+        return _taskRows
+            .OrderBy(task => task.SortOrder)
+            .Select(task => task.Clone())
+            .ToList();
+    }
+
+    private void OnSchedulerSnapshotUpdated(SchedulerSnapshot snapshot)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            CurrentPlaybackText.Text = snapshot.CurrentTrackName;
+            NextTriggerText.Text = snapshot.NextTrigger;
+            SchedulerStatusText.Text = snapshot.SchedulerStatus;
+            ConflictHintText.Text = snapshot.ConflictHint;
+
+            foreach (var task in _taskRows)
+            {
+                if (!task.IsEnabled)
+                {
+                    task.RuntimeStatus = "已停用";
+                    continue;
+                }
+
+                task.RuntimeStatus = snapshot.CurrentTaskId == task.Id ? "播放中" : "等待中";
+            }
+
+            TaskGrid.Items.Refresh();
+        });
+    }
+
+    private async Task PersistAsync()
+    {
+        var config = TaskDefinitionMapper.ToConfiguration(_taskRows);
+        await _configStore.SaveAsync(config);
+    }
+
+    private void ReplaceTasks(IEnumerable<TaskDefinition> tasks)
+    {
+        _taskRows.Clear();
+        foreach (var task in tasks.OrderBy(task => task.SortOrder))
+        {
+            _taskRows.Add(task);
+        }
+
+        NormalizeOrder();
+        TaskGrid.Items.Refresh();
+    }
+
+    private void NormalizeOrder()
+    {
+        for (var i = 0; i < _taskRows.Count; i++)
+        {
+            _taskRows[i].SortOrder = i;
+        }
+    }
+
+    private static List<TaskDefinition> BuildDefaultTasks() =>
+    [
+        new TaskDefinition
+        {
+            Name = "周一晨间",
+            AudioPath = "D:/audio/morning_focus.mp3",
+            StartDay = DayOfWeek.Monday,
+            StartTime = new TimeOnly(6, 0),
+            EndDay = DayOfWeek.Monday,
+            EndTime = new TimeOnly(8, 0),
+            Priority = 100,
+            IsEnabled = true,
+            FadeInMs = 1500,
+            FadeOutMs = 1500,
+            SortOrder = 0
+        },
+        new TaskDefinition
+        {
+            Name = "周二深夜",
+            AudioPath = "D:/audio/night_guard.mp3",
+            StartDay = DayOfWeek.Tuesday,
+            StartTime = new TimeOnly(23, 0),
+            EndDay = DayOfWeek.Wednesday,
+            EndTime = new TimeOnly(5, 0),
+            Priority = 100,
+            IsEnabled = true,
+            FadeInMs = 1500,
+            FadeOutMs = 1500,
+            SortOrder = 1
+        }
+    ];
+}

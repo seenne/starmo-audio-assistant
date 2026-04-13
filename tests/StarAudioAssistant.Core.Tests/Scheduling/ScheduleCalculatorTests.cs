@@ -67,6 +67,68 @@ public class ScheduleCalculatorTests
         Assert.Null(next);
     }
 
+    [Fact]
+    public void GetEndBoundary_ReturnsSameDayEnd_WhenEndAfterStart()
+    {
+        var rule = new ScheduleRule(
+            Name: "白天任务",
+            AudioPath: "D:/audio/day.mp3",
+            StartDay: DayOfWeek.Monday,
+            StartTime: new TimeOnly(6, 0),
+            EndDay: DayOfWeek.Monday,
+            EndTime: new TimeOnly(8, 0),
+            Priority: 100,
+            Enabled: true);
+
+        var start = At(2026, 4, 13, 6, 0);
+
+        var end = ScheduleCalculator.GetEndBoundary(rule, start);
+
+        Assert.Equal(At(2026, 4, 13, 8, 0), end);
+    }
+
+    [Fact]
+    public void GetEndBoundary_ReturnsNextDayEnd_WhenCrossDayWindow()
+    {
+        var rule = new ScheduleRule(
+            Name: "夜间任务",
+            AudioPath: "D:/audio/night.mp3",
+            StartDay: DayOfWeek.Tuesday,
+            StartTime: new TimeOnly(23, 0),
+            EndDay: DayOfWeek.Wednesday,
+            EndTime: new TimeOnly(5, 0),
+            Priority: 100,
+            Enabled: true);
+
+        var start = At(2026, 4, 14, 23, 0);
+
+        var end = ScheduleCalculator.GetEndBoundary(rule, start);
+
+        Assert.Equal(At(2026, 4, 15, 5, 0), end);
+    }
+
+    [Fact]
+    public void IsBoundaryCrossed_ReturnsTrue_WhenBoundaryWithinRange()
+    {
+        var from = At(2026, 4, 13, 22, 59);
+        var to = At(2026, 4, 13, 23, 1);
+
+        var crossed = ScheduleCalculator.IsBoundaryCrossed(DayOfWeek.Monday, new TimeOnly(23, 0), from, to);
+
+        Assert.True(crossed);
+    }
+
+    [Fact]
+    public void IsBoundaryCrossed_ReturnsFalse_WhenBoundaryOutsideRange()
+    {
+        var from = At(2026, 4, 13, 22, 0);
+        var to = At(2026, 4, 13, 22, 30);
+
+        var crossed = ScheduleCalculator.IsBoundaryCrossed(DayOfWeek.Monday, new TimeOnly(23, 0), from, to);
+
+        Assert.False(crossed);
+    }
+
     private static ScheduleRule CreateRule(DayOfWeek startDay, TimeOnly startTime) =>
         new(
             Name: "测试任务",
