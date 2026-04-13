@@ -3,126 +3,164 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:StarAudioAssistant.App"
         mc:Ignorable="d"
         Title="星辰音频助手"
-        Width="1220"
-        Height="760"
-        MinWidth="1040"
-        MinHeight="620"
+        Width="1280"
+        Height="820"
+        MinWidth="1120"
+        MinHeight="680"
         Background="#EEF5FF"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Closing="Window_Closing">
     <Window.Resources>
+        <LinearGradientBrush x:Key="PageBg" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Offset="0" Color="#F4F8FF"/>
+            <GradientStop Offset="1" Color="#EAF2FF"/>
+        </LinearGradientBrush>
+
         <Style x:Key="ToolbarButtonStyle" TargetType="Button">
-            <Setter Property="Padding" Value="10,5" />
-            <Setter Property="Margin" Value="0,0,8,0" />
-            <Setter Property="BorderBrush" Value="#BCCADE" />
+            <Setter Property="Padding" Value="14,7" />
+            <Setter Property="Margin" Value="0,0,10,8" />
+            <Setter Property="BorderBrush" Value="#C7D5E8" />
             <Setter Property="Background" Value="White" />
             <Setter Property="Foreground" Value="#2F4362" />
             <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F2F7FF" />
+            <Setter Property="Foreground" Value="#234066" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="BorderBrush" Value="#D7E0EC" />
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5FAFF"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#E6EFFF"/>
+                    <Setter Property="Foreground" Value="#0F2F57"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Border Margin="14" CornerRadius="12" BorderBrush="#D7E0EC" BorderThickness="1" Background="White">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="56" />
-                <RowDefinition Height="52" />
-                <RowDefinition Height="52" />
-                <RowDefinition Height="54" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="36" />
-            </Grid.RowDefinitions>
+    <Grid Background="{StaticResource PageBg}">
+        <Border Margin="18" CornerRadius="14" BorderBrush="#D5E1F1" BorderThickness="1" Background="White" Padding="18">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="64" />
+                    <RowDefinition Height="64" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="52" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="44" />
+                </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" Background="#FBFDFF">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
-                    <Ellipse Width="10" Height="10" Fill="#1F4E94" Margin="0,0,10,0" />
-                    <TextBlock Text="星辰音频助手" FontSize="20" FontWeight="SemiBold" Foreground="#1B3761" />
-                </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
-                    <Button Content="最小化到托盘" Padding="12,5" Margin="0,0,8,0" Click="MinimizeToTrayButton_Click" />
-                    <Button Content="关闭" Padding="14,5" Click="CloseButton_Click" />
-                </StackPanel>
-            </Grid>
-
-            <Grid Grid.Row="1" Margin="16,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="定时任务" VerticalAlignment="Center" FontSize="24" FontWeight="SemiBold" Foreground="#16345F" />
-                <TextBlock Grid.Column="1"
-                           VerticalAlignment="Center"
-                           Foreground="#5C6B7F"
-                           FontSize="13"
-                           Text="调度策略：新任务到点立即切换，错过开始点则跳过" />
-            </Grid>
-
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="16,8,16,8">
-                <Button Style="{StaticResource ToolbarButtonStyle}" Background="#1F4E94" Foreground="White" BorderBrush="#1F4E94" Content="新增任务" Click="AddTaskButton_Click" />
-                <Button Style="{StaticResource ToolbarButtonStyle}" Content="编辑任务" Click="EditTaskButton_Click" />
-                <Button Style="{StaticResource ToolbarButtonStyle}" Content="删除任务" Click="DeleteTaskButton_Click" />
-                <Button Style="{StaticResource ToolbarButtonStyle}" Content="启用/停用" Click="ToggleTaskButton_Click" />
-                <Button Style="{StaticResource ToolbarButtonStyle}" Content="测试播放" Click="TestPlaybackButton_Click" />
-                <Button Style="{StaticResource ToolbarButtonStyle}" Content="停止播放" Click="StopPlaybackButton_Click" />
-            </StackPanel>
-
-            <Border Grid.Row="3" Margin="16,6,16,10" BorderBrush="#FFD7AD" BorderThickness="1" Background="#FFF6EC" CornerRadius="8" Padding="10,8">
-                <Grid>
+                <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="ConflictHintText"
-                               VerticalAlignment="Center"
-                               Foreground="#7A3F00"
-                               FontSize="13"
-                               Text="当前暂无冲突。" />
-                    <Button Grid.Column="1" Content="查看冲突详情" Padding="12,4" Margin="10,0,0,0" Click="ViewConflictButton_Click" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="12" Height="12" Fill="#1F4E94" Margin="0,0,10,0" />
+                        <TextBlock Text="星辰音频助手" FontSize="24" FontWeight="SemiBold" Foreground="#1B3761" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="最小化到托盘" Padding="14,6" Margin="0,0,8,0" Click="MinimizeToTrayButton_Click" />
+                        <Button Content="关闭" Padding="16,6" Click="CloseButton_Click" />
+                    </StackPanel>
                 </Grid>
-            </Border>
 
-            <Grid Grid.Row="4" Margin="16,0,16,10">
-                <DataGrid x:Name="TaskGrid"
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="定时任务"
+                               VerticalAlignment="Center"
+                               FontSize="27"
+                               FontWeight="SemiBold"
+                               Foreground="#16345F" />
+                    <TextBlock Grid.Column="1"
+                               VerticalAlignment="Center"
+                               Foreground="#5F7188"
+                               FontSize="13"
+                               Text="策略：新任务到点立即切换；错过开始点则跳过" />
+                </Grid>
+
+                <WrapPanel Grid.Row="2" Margin="0,4,0,4">
+                    <Button Style="{StaticResource ToolbarButtonStyle}" Background="#1F4E94" Foreground="White" BorderBrush="#1F4E94" Content="新增任务" Click="AddTaskButton_Click" />
+                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="编辑任务" Click="EditTaskButton_Click" />
+                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="删除任务" Click="DeleteTaskButton_Click" />
+                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="启用/停用" Click="ToggleTaskButton_Click" />
+                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="测试播放" Click="TestPlaybackButton_Click" />
+                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="停止播放" Click="StopPlaybackButton_Click" />
+                </WrapPanel>
+
+                <Border Grid.Row="3" Margin="0,8,0,12" BorderBrush="#FFD9B0" BorderThickness="1" Background="#FFF6EC" CornerRadius="8" Padding="12,8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="ConflictHintText"
+                                   VerticalAlignment="Center"
+                                   Foreground="#7A3F00"
+                                   FontSize="13"
+                                   Text="当前暂无冲突。" />
+                        <Button Grid.Column="1" Content="查看冲突详情" Padding="12,5" Margin="10,0,0,0" Click="ViewConflictButton_Click" />
+                    </Grid>
+                </Border>
+
+                <DataGrid Grid.Row="4"
+                          x:Name="TaskGrid"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           IsReadOnly="True"
                           HeadersVisibility="Column"
                           GridLinesVisibility="Horizontal"
                           SelectionMode="Single"
+                          SelectionUnit="FullRow"
                           RowHeaderWidth="0"
+                          AlternationCount="2"
+                          RowBackground="White"
+                          AlternatingRowBackground="#FAFCFF"
+                          BorderBrush="#D7E0EC"
+                          BorderThickness="1"
                           MouseDoubleClick="TaskGrid_MouseDoubleClick">
                     <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Header="启用" Binding="{Binding IsEnabled}" Width="70" />
-                        <DataGridTextColumn Header="任务名" Binding="{Binding Name}" Width="140" />
-                        <DataGridTextColumn Header="时间" Binding="{Binding TimeRange}" Width="190" />
-                        <DataGridTextColumn Header="规则" Binding="{Binding RuleType}" Width="140" />
-                        <DataGridTextColumn Header="音频文件名" Binding="{Binding AudioFileName}" Width="200" />
-                        <DataGridTextColumn Header="淡入淡出" Binding="{Binding FadeDisplay}" Width="120" />
-                        <DataGridTextColumn Header="优先级" Binding="{Binding Priority}" Width="80" />
-                        <DataGridTextColumn Header="状态" Binding="{Binding RuntimeStatus}" Width="120" />
+                        <DataGridCheckBoxColumn Header="启用" Binding="{Binding IsEnabled}" Width="68" />
+                        <DataGridTextColumn Header="任务名" Binding="{Binding Name}" Width="1.1*" />
+                        <DataGridTextColumn Header="时间段" Binding="{Binding TimeRange}" Width="1.55*" />
+                        <DataGridTextColumn Header="音频文件" Binding="{Binding AudioFileName}" Width="1.5*" />
+                        <DataGridTextColumn Header="优先级" Binding="{Binding Priority}" Width="88" />
+                        <DataGridTextColumn Header="状态" Binding="{Binding RuntimeStatus}" Width="110" />
+                        <DataGridTextColumn Header="下一次触发" Binding="{Binding NextTriggerText}" Width="170" />
                     </DataGrid.Columns>
                 </DataGrid>
-            </Grid>
 
-            <Border Grid.Row="5" BorderBrush="#D7E0EC" BorderThickness="0,1,0,0" Background="#F4F8FF">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
-                    <TextBlock Foreground="#435974" FontSize="12" Text="当前播放：" />
-                    <TextBlock x:Name="CurrentPlaybackText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="无" />
-                    <TextBlock Margin="14,0" Foreground="#BCCADE" Text="|" />
-                    <TextBlock Foreground="#435974" FontSize="12" Text="下一任务：" />
-                    <TextBlock x:Name="NextTriggerText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="无" />
-                    <TextBlock Margin="14,0" Foreground="#BCCADE" Text="|" />
-                    <TextBlock Foreground="#435974" FontSize="12" Text="调度状态：" />
-                    <TextBlock x:Name="SchedulerStatusText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="启动中" />
-                </StackPanel>
-            </Border>
-        </Grid>
-    </Border>
+                <Border Grid.Row="5" BorderBrush="#D7E0EC" BorderThickness="0,1,0,0" Background="#F4F8FF" Margin="0,12,0,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
+                        <TextBlock Foreground="#435974" FontSize="12" Text="当前播放：" />
+                        <TextBlock x:Name="CurrentPlaybackText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="无" />
+                        <TextBlock Margin="14,0" Foreground="#BCCADE" Text="|" />
+                        <TextBlock Foreground="#435974" FontSize="12" Text="下一任务：" />
+                        <TextBlock x:Name="NextTriggerText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="无" />
+                        <TextBlock Margin="14,0" Foreground="#BCCADE" Text="|" />
+                        <TextBlock Foreground="#435974" FontSize="12" Text="调度状态：" />
+                        <TextBlock x:Name="SchedulerStatusText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="启动中" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

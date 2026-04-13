@@ -1,12 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Media;
 using StarAudioAssistant.App.Models;
 using StarAudioAssistant.App.Services;
 using StarAudioAssistant.Audio.Playback;
+using StarAudioAssistant.Core.Scheduling;
 using StarAudioAssistant.Infrastructure.Configuration;
-using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 
 namespace StarAudioAssistant.App;
@@ -81,11 +83,13 @@ public partial class MainWindow : Window
         }
 
         editor.Result.SortOrder = _taskRows.Count;
+        editor.Result.RuntimeStatus = editor.Result.IsEnabled ? "等待中" : "已停用";
         _taskRows.Add(editor.Result);
+
         NormalizeOrder();
         await PersistAsync();
         _scheduler.Refresh();
-        TaskGrid.Items.Refresh();
+        TaskGrid.SelectedItem = editor.Result;
     }
 
     private async void EditTaskButton_Click(object sender, RoutedEventArgs e)
@@ -102,18 +106,13 @@ public partial class MainWindow : Window
             return;
         }
 
-        var index = _taskRows.IndexOf(selected);
-        if (index < 0)
-        {
-            return;
-        }
+        selected.UpdateFrom(editor.Result);
+        selected.RuntimeStatus = selected.IsEnabled ? "等待中" : "已停用";
 
-        editor.Result.SortOrder = selected.SortOrder;
-        _taskRows[index] = editor.Result;
         NormalizeOrder();
         await PersistAsync();
         _scheduler.Refresh();
-        TaskGrid.Items.Refresh();
+        TaskGrid.SelectedItem = selected;
     }
 
     private async void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
@@ -134,7 +133,6 @@ public partial class MainWindow : Window
         NormalizeOrder();
         await PersistAsync();
         _scheduler.Refresh();
-        TaskGrid.Items.Refresh();
     }
 
     private async void ToggleTaskButton_Click(object sender, RoutedEventArgs e)
@@ -148,7 +146,6 @@ public partial class MainWindow : Window
         selected.IsEnabled = !selected.IsEnabled;
         selected.RuntimeStatus = selected.IsEnabled ? "等待中" : "已停用";
 
-        TaskGrid.Items.Refresh();
         await PersistAsync();
         _scheduler.Refresh();
     }
@@ -178,6 +175,11 @@ public partial class MainWindow : Window
 
     private void TaskGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
+        if (!IsDoubleClickOnRow(e.OriginalSource as DependencyObject))
+        {
+            return;
+        }
+
         EditTaskButton_Click(sender, e);
     }
 
@@ -211,7 +213,7 @@ public partial class MainWindow : Window
         openItem.Click += (_, _) => Dispatcher.Invoke(RestoreFromTray);
 
         var stopItem = new ToolStripMenuItem("停止播放");
-        stopItem.Click += (_, _) => Dispatcher.InvokeAsync(async () => await _scheduler.StopPlaybackAsync());
+        stopItem.Click += (_, _) => Dispatcher.Invoke(() => _ = _scheduler.StopPlaybackAsync());
 
         var exitItem = new ToolStripMenuItem("退出");
         exitItem.Click += (_, _) => Dispatcher.Invoke(() =>
@@ -249,13 +251,14 @@ public partial class MainWindow : Window
                 if (!task.IsEnabled)
                 {
                     task.RuntimeStatus = "已停用";
+                    task.NextTriggerText = "--";
                     continue;
                 }
 
                 task.RuntimeStatus = snapshot.CurrentTaskId == task.Id ? "播放中" : "等待中";
+                var next = ScheduleCalculator.GetNextStart(task.ToScheduleRule(), DateTimeOffset.Now);
+                task.NextTriggerText = next?.ToString("ddd HH:mm") ?? "--";
             }
-
-            TaskGrid.Items.Refresh();
         });
     }
 
@@ -274,7 +277,6 @@ public partial class MainWindow : Window
         }
 
         NormalizeOrder();
-        TaskGrid.Items.Refresh();
     }
 
     private void NormalizeOrder()
@@ -283,6 +285,22 @@ public partial class MainWindow : Window
         {
             _taskRows[i].SortOrder = i;
         }
+    }
+
+    private static bool IsDoubleClickOnRow(DependencyObject? source)
+    {
+        var current = source;
+        while (current is not null)
+        {
+            if (current is DataGridRow)
+            {
+                return true;
+            }
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return false;
     }
 
     private static List<TaskDefinition> BuildDefaultTasks() =>
