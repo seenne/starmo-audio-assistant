@@ -41,3 +41,16 @@ $dotnet = '.\\.dotnet\\dotnet.exe'
 - Config file location: `%AppData%\\StarAudioAssistant\\config.json`
 - Lock-screen playback is supported while the same user session remains active.
 - If configured audio paths do not exist, scheduler status will show an error until paths are fixed.
+
+## Portable Packaging
+Every package run generates a brand-new timestamped zip file.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\pack-portable.ps1
+```
+
+Or double-click:
+- `pack-portable.cmd`
+
+Output folder:
+- `dist\packages\StarAudioAssistant-portable-win-x64-<timestamp>.zip`
