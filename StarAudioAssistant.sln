@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{65576ED3-7081-46A1-BAFE-9B94ED2235A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarAudioAssistant.App", "src\StarAudioAssistant.App\StarAudioAssistant.App.csproj", "{BD9C9C4D-F219-4A2E-A639-68C8E27B38C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarAudioAssistant.Core", "src\StarAudioAssistant.Core\StarAudioAssistant.Core.csproj", "{C52C7E8E-52D1-44D8-B2C4-90E12DA69A2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarAudioAssistant.Audio", "src\StarAudioAssistant.Audio\StarAudioAssistant.Audio.csproj", "{4F550294-71DF-43AD-A7CE-21EBFF83439E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarAudioAssistant.Infrastructure", "src\StarAudioAssistant.Infrastructure\StarAudioAssistant.Infrastructure.csproj", "{4B0E4863-F7F1-4E99-ADE7-72F16B4E995A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{DB214ABA-10C2-4EBC-8AA5-331301A8B354}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarAudioAssistant.Core.Tests", "tests\StarAudioAssistant.Core.Tests\StarAudioAssistant.Core.Tests.csproj", "{D1105CDC-0069-4103-8DAA-E90420BE07DD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BD9C9C4D-F219-4A2E-A639-68C8E27B38C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD9C9C4D-F219-4A2E-A639-68C8E27B38C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD9C9C4D-F219-4A2E-A639-68C8E27B38C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD9C9C4D-F219-4A2E-A639-68C8E27B38C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C52C7E8E-52D1-44D8-B2C4-90E12DA69A2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C52C7E8E-52D1-44D8-B2C4-90E12DA69A2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C52C7E8E-52D1-44D8-B2C4-90E12DA69A2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C52C7E8E-52D1-44D8-B2C4-90E12DA69A2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F550294-71DF-43AD-A7CE-21EBFF83439E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F550294-71DF-43AD-A7CE-21EBFF83439E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F550294-71DF-43AD-A7CE-21EBFF83439E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F550294-71DF-43AD-A7CE-21EBFF83439E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B0E4863-F7F1-4E99-ADE7-72F16B4E995A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B0E4863-F7F1-4E99-ADE7-72F16B4E995A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B0E4863-F7F1-4E99-ADE7-72F16B4E995A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B0E4863-F7F1-4E99-ADE7-72F16B4E995A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1105CDC-0069-4103-8DAA-E90420BE07DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1105CDC-0069-4103-8DAA-E90420BE07DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1105CDC-0069-4103-8DAA-E90420BE07DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1105CDC-0069-4103-8DAA-E90420BE07DD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BD9C9C4D-F219-4A2E-A639-68C8E27B38C5} = {65576ED3-7081-46A1-BAFE-9B94ED2235A7}
+		{C52C7E8E-52D1-44D8-B2C4-90E12DA69A2D} = {65576ED3-7081-46A1-BAFE-9B94ED2235A7}
+		{4F550294-71DF-43AD-A7CE-21EBFF83439E} = {65576ED3-7081-46A1-BAFE-9B94ED2235A7}
+		{4B0E4863-F7F1-4E99-ADE7-72F16B4E995A} = {65576ED3-7081-46A1-BAFE-9B94ED2235A7}
+		{D1105CDC-0069-4103-8DAA-E90420BE07DD} = {DB214ABA-10C2-4EBC-8AA5-331301A8B354}
+	EndGlobalSection
+EndGlobal

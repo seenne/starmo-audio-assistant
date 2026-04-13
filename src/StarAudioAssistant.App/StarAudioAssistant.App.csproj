@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\StarAudioAssistant.Core\StarAudioAssistant.Core.csproj" />
+    <ProjectReference Include="..\StarAudioAssistant.Audio\StarAudioAssistant.Audio.csproj" />
+    <ProjectReference Include="..\StarAudioAssistant.Infrastructure\StarAudioAssistant.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+</Project>

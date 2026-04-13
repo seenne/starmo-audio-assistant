@@ -1,0 +1,550 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>星辰音频助手 - 主界面 Demo</title>
+  <style>
+    :root {
+      --bg-a: #eef5ff;
+      --bg-b: #f8fbff;
+      --shell: #ffffff;
+      --ink: #1e2a3b;
+      --muted: #5c6b7f;
+      --line: #d7e0ec;
+      --line-strong: #bccade;
+      --brand: #1f4e94;
+      --brand-soft: #e8f0fe;
+      --success: #1f7a44;
+      --warning: #b35a00;
+      --warning-soft: #fff6ec;
+      --row-hover: #f6f9ff;
+      --shadow: 0 12px 30px rgba(19, 47, 89, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(1200px 520px at 8% -8%, #dce9ff 6%, transparent 56%),
+        linear-gradient(160deg, var(--bg-a), var(--bg-b));
+      color: var(--ink);
+      font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+      padding: 22px;
+    }
+
+    .window {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      background: var(--shell);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto auto auto 1fr auto;
+      min-height: calc(100vh - 44px);
+    }
+
+    .topbar {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px 0 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #fbfdff);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-size: 18px;
+      color: #1b3761;
+    }
+
+    .brand .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px var(--brand-soft);
+    }
+
+    .window-actions { display: flex; gap: 8px; align-items: center; }
+
+    .action {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: #31425c;
+      border-radius: 8px;
+      height: 32px;
+      padding: 0 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .action:hover { background: #f7fbff; }
+
+    .main-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 10px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .main-head h1 {
+      margin: 0;
+      font-size: 21px;
+      color: #16345f;
+      letter-spacing: 0.4px;
+    }
+
+    .head-right { font-size: 13px; color: var(--muted); }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fcfeff;
+    }
+
+    .btn {
+      border: 1px solid var(--line-strong);
+      background: #ffffff;
+      color: #2f4362;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .btn:hover { background: #f4f9ff; }
+
+    .btn.primary {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: #ffffff;
+    }
+
+    .btn.primary:hover { background: #1b4584; }
+
+    .conflict {
+      margin: 10px 18px 0 18px;
+      border: 1px solid #ffd7ad;
+      background: var(--warning-soft);
+      color: #7a3f00;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      padding: 12px 18px 16px 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1020px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    thead th {
+      background: #f3f8ff;
+      color: #2c4264;
+      font-size: 13px;
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 600;
+    }
+
+    tbody td {
+      font-size: 13px;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--line);
+      color: #25364f;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover { background: var(--row-hover); }
+
+    tbody tr.playing { background: #ecfff3; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+
+    .pill-ready {
+      background: #e9f2ff;
+      color: #1e4c95;
+      border-color: #bfd5fb;
+    }
+
+    .pill-playing {
+      background: #e8f8ee;
+      color: var(--success);
+      border-color: #b7e2c7;
+    }
+
+    .pill-warning {
+      background: #fff3e7;
+      color: var(--warning);
+      border-color: #ffd5ad;
+    }
+
+    .audio-name {
+      max-width: 210px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .check { width: 16px; height: 16px; }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      padding: 0 20px 8px 20px;
+    }
+
+    .statusbar {
+      min-height: 40px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: #435974;
+      background: linear-gradient(180deg, #fbfdff, #f4f8ff);
+      flex-wrap: wrap;
+    }
+
+    .status-item strong {
+      color: #1f3e6d;
+      font-weight: 600;
+    }
+
+    .split {
+      width: 1px;
+      height: 15px;
+      background: var(--line-strong);
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(22, 34, 51, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 99;
+    }
+
+    .modal {
+      width: min(640px, 100%);
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 18px 42px rgba(13, 36, 72, 0.22);
+      overflow: hidden;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #f7fbff;
+      font-weight: 600;
+      color: #1f3f6f;
+      font-size: 15px;
+    }
+
+    .close-x {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+
+    .modal-body {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+      font-size: 13px;
+      color: #2c4569;
+    }
+
+    .field input,
+    .field select {
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      height: 34px;
+      padding: 0 10px;
+      font-size: 13px;
+    }
+
+    .cols2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .modal-foot {
+      padding: 11px 14px 14px 14px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 920px) {
+      body { padding: 12px; }
+
+      .window {
+        min-height: calc(100vh - 24px);
+      }
+
+      .topbar,
+      .main-head,
+      .toolbar,
+      .table-wrap,
+      .conflict {
+        margin-left: 12px;
+        margin-right: 12px;
+      }
+
+      .topbar,
+      .main-head,
+      .toolbar,
+      .table-wrap {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .head-right { display: none; }
+
+      .cols2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <header class="topbar">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>星辰音频助手</span>
+      </div>
+      <div class="window-actions">
+        <button class="action">最小化到托盘</button>
+        <button class="action">关闭</button>
+      </div>
+    </header>
+
+    <section class="main-head">
+      <h1>定时任务</h1>
+      <div class="head-right">调度策略：新任务到点立即切换，错过开始点则跳过</div>
+    </section>
+
+    <section class="toolbar">
+      <button class="btn primary">新增任务</button>
+      <button class="btn">编辑任务</button>
+      <button class="btn">删除任务</button>
+      <button class="btn">启用/停用</button>
+      <button class="btn">测试播放</button>
+      <button class="btn">导入配置</button>
+      <button class="btn">导出配置</button>
+    </section>
+
+    <section class="conflict">
+      <span>冲突提示：周二 23:00 时，“周二深夜”将抢占当前播放任务（优先级同级，按列表顺序执行）。</span>
+      <button class="btn">查看冲突详情</button>
+    </section>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:72px;">启用</th>
+            <th style="width:160px;">任务名</th>
+            <th style="width:210px;">时间</th>
+            <th style="width:150px;">规则</th>
+            <th style="width:220px;">音频文件名</th>
+            <th style="width:130px;">淡入淡出</th>
+            <th style="width:80px;">优先级</th>
+            <th style="width:160px;">下一次触发</th>
+            <th style="width:130px;">状态</th>
+          </tr>
+        </thead>
+        <tbody id="taskTableBody">
+          <tr class="playing" data-task="周一晨间" data-time="Mon 06:00 -> Mon 08:00" data-audio="morning_focus.mp3" data-fade="1.5s / 1.5s" data-priority="100">
+            <td><input class="check" type="checkbox" checked /></td>
+            <td>周一晨间</td>
+            <td>Mon 06:00 -> Mon 08:00</td>
+            <td>每周循环</td>
+            <td class="audio-name">morning_focus.mp3</td>
+            <td>1.5s / 1.5s</td>
+            <td>100</td>
+            <td>2026-04-20 06:00</td>
+            <td><span class="status-pill pill-playing">播放中</span></td>
+          </tr>
+          <tr data-task="周二深夜" data-time="Tue 23:00 -> Wed 05:00" data-audio="night_guard.mp3" data-fade="1.5s / 1.5s" data-priority="100">
+            <td><input class="check" type="checkbox" checked /></td>
+            <td>周二深夜</td>
+            <td>Tue 23:00 -> Wed 05:00</td>
+            <td>跨天循环</td>
+            <td class="audio-name">night_guard.mp3</td>
+            <td>1.5s / 1.5s</td>
+            <td>100</td>
+            <td>2026-04-14 23:00</td>
+            <td><span class="status-pill pill-ready">等待中</span></td>
+          </tr>
+          <tr data-task="午间提醒" data-time="Mon-Fri 12:20 -> 12:35" data-audio="lunch_chime.mp3" data-fade="1.0s / 1.0s" data-priority="80">
+            <td><input class="check" type="checkbox" checked /></td>
+            <td>午间提醒</td>
+            <td>Mon-Fri 12:20 -> 12:35</td>
+            <td>工作日</td>
+            <td class="audio-name">lunch_chime.mp3</td>
+            <td>1.0s / 1.0s</td>
+            <td>80</td>
+            <td>2026-04-13 12:20</td>
+            <td><span class="status-pill pill-ready">等待中</span></td>
+          </tr>
+          <tr data-task="备用播报" data-time="Sat 09:00 -> Sat 10:00" data-audio="backup_voice.mp3" data-fade="2.0s / 2.0s" data-priority="60">
+            <td><input class="check" type="checkbox" /></td>
+            <td>备用播报</td>
+            <td>Sat 09:00 -> Sat 10:00</td>
+            <td>每周循环</td>
+            <td class="audio-name">backup_voice.mp3</td>
+            <td>2.0s / 2.0s</td>
+            <td>60</td>
+            <td>2026-04-18 09:00</td>
+            <td><span class="status-pill pill-warning">已停用</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="hint">提示：双击任意任务行可直接打开编辑弹窗。</div>
+    </section>
+
+    <footer class="statusbar">
+      <span class="status-item">当前播放：<strong>morning_focus.mp3</strong></span>
+      <span class="split"></span>
+      <span class="status-item">下一任务：<strong>Tue 23:00 周二深夜</strong></span>
+      <span class="split"></span>
+      <span class="status-item">音频设备：<strong>默认扬声器 (Realtek)</strong></span>
+      <span class="split"></span>
+      <span class="status-item">调度状态：<strong>运行中</strong></span>
+    </footer>
+  </div>
+
+  <div class="modal-mask" id="editMask">
+    <div class="modal">
+      <div class="modal-head">
+        <span>编辑任务</span>
+        <button class="close-x" id="closeModal">x</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>任务名称</label>
+          <input id="mTask" value="" />
+        </div>
+        <div class="field">
+          <label>音频文件</label>
+          <input id="mAudio" value="" />
+        </div>
+        <div class="field">
+          <label>时间范围</label>
+          <input id="mTime" value="" />
+        </div>
+        <div class="cols2">
+          <div class="field">
+            <label>淡入淡出</label>
+            <input id="mFade" value="" />
+          </div>
+          <div class="field">
+            <label>优先级</label>
+            <input id="mPriority" value="" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" id="cancelBtn">取消</button>
+        <button class="btn primary">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const mask = document.getElementById("editMask");
+    const taskInput = document.getElementById("mTask");
+    const audioInput = document.getElementById("mAudio");
+    const timeInput = document.getElementById("mTime");
+    const fadeInput = document.getElementById("mFade");
+    const priorityInput = document.getElementById("mPriority");
+
+    function openEditor(row) {
+      taskInput.value = row.dataset.task || "";
+      audioInput.value = row.dataset.audio || "";
+      timeInput.value = row.dataset.time || "";
+      fadeInput.value = row.dataset.fade || "";
+      priorityInput.value = row.dataset.priority || "";
+      mask.style.display = "flex";
+    }
+
+    function closeEditor() {
+      mask.style.display = "none";
+    }
+
+    document.querySelectorAll("#taskTableBody tr").forEach((row) => {
+      row.addEventListener("dblclick", () => openEditor(row));
+    });
+
+    document.getElementById("closeModal").addEventListener("click", closeEditor);
+    document.getElementById("cancelBtn").addEventListener("click", closeEditor);
+
+    mask.addEventListener("click", (event) => {
+      if (event.target === mask) closeEditor();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeEditor();
+    });
+  </script>
+</body>
+</html>
