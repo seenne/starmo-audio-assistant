@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="星辰音频助手"
+        Title="星晨音频助手"
         Width="1360"
         Height="860"
         MinWidth="1200"
@@ -70,7 +70,7 @@
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Ellipse Width="12" Height="12" Fill="#2A5CA9" Margin="0,0,10,0"/>
-                        <TextBlock Text="星辰音频助手" FontSize="26" FontWeight="SemiBold" Foreground="#183760"/>
+                        <TextBlock Text="星晨音频助手" FontSize="26" FontWeight="SemiBold" Foreground="#183760"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">

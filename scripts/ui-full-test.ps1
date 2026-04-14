@@ -265,7 +265,7 @@ function Set-QuickFilterByKeyboard($scope) {
     $combo.SetFocus()
 }
 
-$configDir = Join-Path $env:APPDATA 'StarAudioAssistant'
+$configDir = Join-Path $env:APPDATA 'StarmoAudioAssistant'
 $configPath = Join-Path $configDir 'config.json'
 $backupPath = Join-Path $configDir ('config.json.ui-test-backup-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $reportPath = Join-Path (Resolve-Path '.').Path 'dist\ui-test-report.txt'

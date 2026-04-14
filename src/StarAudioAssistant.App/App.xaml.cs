@@ -5,10 +5,12 @@ namespace StarAudioAssistant.App;
 
 public partial class App : System.Windows.Application
 {
+    private const string CurrentAppFolderName = "StarmoAudioAssistant";
+
     private string LogDirectory =>
         Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "StarAudioAssistant",
+            CurrentAppFolderName,
             "logs");
 
     protected override void OnStartup(System.Windows.StartupEventArgs e)
@@ -29,18 +31,18 @@ public partial class App : System.Windows.Application
 
     private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
-        WriteFatalLog("UI线程异常", e.Exception.ToString());
+        WriteFatalLog("UI thread exception", e.Exception.ToString());
     }
 
     private void OnUnhandledException(object? sender, UnhandledExceptionEventArgs e)
     {
-        var detail = e.ExceptionObject?.ToString() ?? "未知异常";
-        WriteFatalLog("未处理异常", detail);
+        var detail = e.ExceptionObject?.ToString() ?? "Unknown exception.";
+        WriteFatalLog("Unhandled exception", detail);
     }
 
     private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        WriteFatalLog("后台任务未观察异常", e.Exception.ToString());
+        WriteFatalLog("Unobserved task exception", e.Exception.ToString());
         e.SetObserved();
     }
 

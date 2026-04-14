@@ -64,7 +64,7 @@ public partial class MainWindow : Window
         {
             Icon = System.Drawing.SystemIcons.Information,
             Visible = true,
-            Text = "星辰音频助手"
+            Text = "星晨音频助手"
         };
 
         _notifyIcon.DoubleClick += (_, _) => RestoreFromTray();
@@ -348,7 +348,7 @@ public partial class MainWindow : Window
     {
         Hide();
         ShowInTaskbar = false;
-        _notifyIcon.BalloonTipTitle = "星辰音频助手";
+        _notifyIcon.BalloonTipTitle = "星晨音频助手";
         _notifyIcon.BalloonTipText = "程序仍在后台运行，可从托盘恢复。";
         _notifyIcon.ShowBalloonTip(1200);
     }

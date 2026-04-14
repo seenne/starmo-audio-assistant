@@ -23,7 +23,7 @@ public sealed class ErrorCenterService
     public string BuildDiagnosticsText()
     {
         var sb = new StringBuilder();
-        sb.AppendLine("Star Audio Assistant Diagnostics");
+        sb.AppendLine("Starmo Audio Assistant Diagnostics");
         sb.AppendLine($"Generated: {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz}");
         sb.AppendLine();
 

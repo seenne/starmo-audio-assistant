@@ -8,7 +8,7 @@ public sealed class JsonConfigurationStoreTests : IDisposable
 
     public JsonConfigurationStoreTests()
     {
-        _root = Path.Combine(Path.GetTempPath(), "StarAudioAssistant.Tests", Guid.NewGuid().ToString("N"));
+        _root = Path.Combine(Path.GetTempPath(), "StarmoAudioAssistant.Tests", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_root);
     }
 

@@ -1,10 +1,10 @@
 ﻿<p align="center">
-  <img src="assets/readme/hero.svg" alt="Star Audio Assistant Banner" width="100%" />
+  <img src="assets/readme/hero.svg" alt="Starmo Audio Assistant Banner" width="100%" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/seenne/star-audio-assistant/releases/latest">
-    <img alt="Release" src="https://img.shields.io/github/v/release/seenne/star-audio-assistant?label=Release&color=2A5CAA">
+  <a href="https://github.com/seenne/starmo-audio-assistant/releases/latest">
+    <img alt="Release" src="https://img.shields.io/github/v/release/seenne/starmo-audio-assistant?label=Release&color=2A5CAA">
   </a>
   <a href="./LICENSE">
     <img alt="License" src="https://img.shields.io/badge/License-MIT-1F8B4C">
@@ -13,16 +13,16 @@
   <img alt=".NET" src="https://img.shields.io/badge/.NET-8-512BD4">
 </p>
 
-<h1 align="center">Star Audio Assistant</h1>
+<h1 align="center">Starmo Audio Assistant</h1>
 
 <p align="center">
   <a href="#中文介绍">中文</a> ·
   <a href="#english-overview">English</a> ·
-  <a href="https://github.com/seenne/star-audio-assistant/releases/latest">Download</a>
+  <a href="https://github.com/seenne/starmo-audio-assistant/releases/latest">Download</a>
 </p>
 
 ## 中文介绍
-`Star Audio Assistant` 是一款面向 Windows 的轻量级定时音频助手。  
+`Starmo Audio Assistant`（星晨音频助手）是一款面向 Windows 的轻量级定时音频助手。  
 它支持按周循环或单次时间段触发播放，支持跨天任务、淡入淡出、托盘后台运行，并优先保证“可预期”和“稳定”。
 
 ### 核心能力
@@ -38,7 +38,7 @@
 - 值班提醒、班次提示与时间窗广播
 
 ## English Overview
-`Star Audio Assistant` is a lightweight Windows scheduler for MP3 audio playback.  
+`Starmo Audio Assistant` is a lightweight Windows scheduler for MP3 audio playback.  
 It supports weekly and one-time schedules, cross-day windows, smooth fade transitions, tray-first workflow, and reliability-focused orchestration.
 
 ### Key Capabilities
@@ -75,7 +75,7 @@ Or double-click:
 - `pack-portable.cmd`
 
 Output:
-- `dist\packages\StarAudioAssistant-portable-win-x64-<timestamp>.zip`
+- `dist\packages\StarmoAudioAssistant-portable-win-x64-<timestamp>.zip`
 
 ## Architecture
 - `src/StarAudioAssistant.App`: WPF desktop UI, tray shell, task editor
@@ -85,9 +85,9 @@ Output:
 - `tests/StarAudioAssistant.Core.Tests`: scheduling and config regression tests
 
 ## Runtime Notes
-- Config path: `%AppData%\\StarAudioAssistant\\config.json`
+- Config path: `%AppData%\\StarmoAudioAssistant\\config.json`
 - Lock-screen playback is supported under the same logged-in Windows session
 - Invalid/missing audio files are surfaced in health checks and error center
 
 ## License
-MIT © 2026 Star Audio Assistant Contributors
+MIT © 2026 Starmo Audio Assistant Contributors

@@ -16,7 +16,7 @@ if (-not (Test-Path $project)) {
 }
 
 $timestamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$packageName = "StarAudioAssistant-portable-$Runtime-$timestamp"
+$packageName = "StarmoAudioAssistant-portable-$Runtime-$timestamp"
 $publishDir = Join-Path $root "dist\publish\$packageName"
 $packageDir = Join-Path $root 'dist\packages'
 $zipPath = Join-Path $packageDir "$packageName.zip"
@@ -37,7 +37,7 @@ Write-Host "Publishing app..."
     /p:DebugSymbols=false `
     -o $publishDir
 
-$launcherPath = Join-Path $publishDir 'Start-StarAudioAssistant.cmd'
+$launcherPath = Join-Path $publishDir 'Start-StarmoAudioAssistant.cmd'
 @"
 @echo off
 setlocal
@@ -47,14 +47,14 @@ set APP_DIR=%~dp0
 
 $notesPath = Join-Path $publishDir 'PORTABLE-README.txt'
 @"
-Star Audio Assistant Portable Package
+Starmo Audio Assistant Portable Package
 
 Run:
-- Double-click Start-StarAudioAssistant.cmd
+- Double-click Start-StarmoAudioAssistant.cmd
 - or run StarAudioAssistant.App.exe directly
 
 Config file location:
-- %AppData%\StarAudioAssistant\config.json
+- %AppData%\StarmoAudioAssistant\config.json
 
 Build timestamp: $timestamp
 Runtime: $Runtime

@@ -5,6 +5,8 @@ namespace StarAudioAssistant.Infrastructure.Configuration;
 
 public sealed class JsonConfigurationStore
 {
+    private const string CurrentAppFolderName = "StarmoAudioAssistant";
+    private const string LegacyAppFolderName = "StarAudioAssistant";
     private readonly SemaphoreSlim _ioGate = new(1, 1);
     private readonly JsonSerializerOptions _serializerOptions = new()
     {
@@ -14,10 +16,16 @@ public sealed class JsonConfigurationStore
 
     public JsonConfigurationStore(string? filePath = null)
     {
-        FilePath = filePath ?? Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "StarAudioAssistant",
-            "config.json");
+        if (!string.IsNullOrWhiteSpace(filePath))
+        {
+            FilePath = filePath;
+            return;
+        }
+
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var currentPath = Path.Combine(appData, CurrentAppFolderName, "config.json");
+        TryMigrateLegacyConfig(appData, currentPath);
+        FilePath = currentPath;
     }
 
     public string FilePath { get; }
@@ -116,6 +124,35 @@ public sealed class JsonConfigurationStore
         catch
         {
             // Ignore backup failures; load path will still recover with defaults.
+        }
+    }
+
+    private static void TryMigrateLegacyConfig(string appData, string currentPath)
+    {
+        try
+        {
+            if (File.Exists(currentPath))
+            {
+                return;
+            }
+
+            var legacyPath = Path.Combine(appData, LegacyAppFolderName, "config.json");
+            if (!File.Exists(legacyPath))
+            {
+                return;
+            }
+
+            var currentDirectory = Path.GetDirectoryName(currentPath);
+            if (!string.IsNullOrWhiteSpace(currentDirectory))
+            {
+                Directory.CreateDirectory(currentDirectory);
+            }
+
+            File.Copy(legacyPath, currentPath, overwrite: false);
+        }
+        catch
+        {
+            // Ignore migration failures and continue with defaults.
         }
     }
 
