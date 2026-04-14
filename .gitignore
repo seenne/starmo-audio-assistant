@@ -23,3 +23,6 @@ Thumbs.db
 
 # Optional artifacts
 *.nupkg
+
+# Local temporary debug scripts
+scripts/_*.ps1

@@ -14,6 +14,9 @@ public sealed class TaskDefinition : INotifyPropertyChanged
     private TimeOnly _startTime;
     private DayOfWeek _endDay;
     private TimeOnly _endTime;
+    private DateOnly? _startDate;
+    private DateOnly? _endDate;
+    private TaskRecurrenceMode _recurrenceMode = TaskRecurrenceMode.Weekly;
     private int _priority = 100;
     private bool _isEnabled = true;
     private int _fadeInMs = 1500;
@@ -21,6 +24,10 @@ public sealed class TaskDefinition : INotifyPropertyChanged
     private int _sortOrder;
     private string _runtimeStatus = "等待中";
     private string _nextTriggerText = "待计算";
+    private TaskScheduleMode _scheduleMode = TaskScheduleMode.EveryWeek;
+    private bool _skipOnHoliday;
+    private DateOnly? _pauseUntilDate;
+    private string _healthIssue = string.Empty;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -110,6 +117,52 @@ public sealed class TaskDefinition : INotifyPropertyChanged
         }
     }
 
+    public DateOnly? StartDate
+    {
+        get => _startDate;
+        set
+        {
+            if (!SetProperty(ref _startDate, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(TimeRange));
+            OnPropertyChanged(nameof(RuleType));
+        }
+    }
+
+    public DateOnly? EndDate
+    {
+        get => _endDate;
+        set
+        {
+            if (!SetProperty(ref _endDate, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(TimeRange));
+            OnPropertyChanged(nameof(RuleType));
+        }
+    }
+
+    public TaskRecurrenceMode RecurrenceMode
+    {
+        get => _recurrenceMode;
+        set
+        {
+            if (!SetProperty(ref _recurrenceMode, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(TimeRange));
+            OnPropertyChanged(nameof(RuleType));
+            OnPropertyChanged(nameof(StrategyText));
+        }
+    }
+
     public int Priority
     {
         get => _priority;
@@ -168,13 +221,100 @@ public sealed class TaskDefinition : INotifyPropertyChanged
         set => SetProperty(ref _nextTriggerText, value);
     }
 
-    public string TimeRange => $"{ToShortDay(StartDay)} {StartTime:HH\\:mm} -> {ToShortDay(EndDay)} {EndTime:HH\\:mm}";
+    public TaskScheduleMode ScheduleMode
+    {
+        get => _scheduleMode;
+        set
+        {
+            if (!SetProperty(ref _scheduleMode, value))
+            {
+                return;
+            }
 
-    public string RuleType => StartDay == EndDay && EndTime > StartTime ? "每周循环" : "跨天循环";
+            OnPropertyChanged(nameof(StrategyText));
+        }
+    }
+
+    public bool SkipOnHoliday
+    {
+        get => _skipOnHoliday;
+        set
+        {
+            if (!SetProperty(ref _skipOnHoliday, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(StrategyText));
+        }
+    }
+
+    public DateOnly? PauseUntilDate
+    {
+        get => _pauseUntilDate;
+        set
+        {
+            if (!SetProperty(ref _pauseUntilDate, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(StrategyText));
+        }
+    }
+
+    public string HealthIssue
+    {
+        get => _healthIssue;
+        set
+        {
+            if (!SetProperty(ref _healthIssue, value))
+            {
+                return;
+            }
+
+            OnPropertyChanged(nameof(HasHealthIssue));
+        }
+    }
+
+    public bool HasHealthIssue => !string.IsNullOrWhiteSpace(HealthIssue);
+
+    public string TimeRange => RecurrenceMode == TaskRecurrenceMode.OneTime && StartDate.HasValue && EndDate.HasValue
+        ? $"{StartDate:yyyy-MM-dd} {StartTime:HH\\:mm} -> {EndDate:yyyy-MM-dd} {EndTime:HH\\:mm}"
+        : $"{ToShortDay(StartDay)} {StartTime:HH\\:mm} -> {ToShortDay(EndDay)} {EndTime:HH\\:mm}";
+
+    public string RuleType => RecurrenceMode == TaskRecurrenceMode.OneTime
+        ? "单次执行"
+        : StartDay == EndDay && EndTime > StartTime ? "每周循环" : "跨天循环";
 
     public string AudioFileName => Path.GetFileName(AudioPath);
 
     public string FadeDisplay => $"{FadeInMs / 1000d:0.0}s / {FadeOutMs / 1000d:0.0}s";
+
+    public string StrategyText
+    {
+        get
+        {
+            var parts = new List<string>
+            {
+                RecurrenceMode == TaskRecurrenceMode.OneTime
+                    ? "单次执行"
+                    : ScheduleMode == TaskScheduleMode.WeekdaysOnly ? "工作日" : "每周"
+            };
+
+            if (SkipOnHoliday)
+            {
+                parts.Add("节假日跳过");
+            }
+
+            if (PauseUntilDate.HasValue)
+            {
+                parts.Add($"停用至 {PauseUntilDate:yyyy-MM-dd}");
+            }
+
+            return string.Join(" · ", parts);
+        }
+    }
 
     public ScheduleRule ToScheduleRule() =>
         new(
@@ -185,7 +325,13 @@ public sealed class TaskDefinition : INotifyPropertyChanged
             EndDay: EndDay,
             EndTime: EndTime,
             Priority: Priority,
-            Enabled: IsEnabled);
+            Enabled: IsEnabled,
+            RecurrenceMode: RecurrenceMode,
+            ScheduleMode: ScheduleMode,
+            SkipOnHoliday: SkipOnHoliday,
+            PauseUntilDate: PauseUntilDate,
+            StartDate: StartDate,
+            EndDate: EndDate);
 
     public TaskDefinition Clone() => new()
     {
@@ -196,13 +342,20 @@ public sealed class TaskDefinition : INotifyPropertyChanged
         StartTime = StartTime,
         EndDay = EndDay,
         EndTime = EndTime,
+        StartDate = StartDate,
+        EndDate = EndDate,
+        RecurrenceMode = RecurrenceMode,
         Priority = Priority,
         IsEnabled = IsEnabled,
         FadeInMs = FadeInMs,
         FadeOutMs = FadeOutMs,
         SortOrder = SortOrder,
         RuntimeStatus = RuntimeStatus,
-        NextTriggerText = NextTriggerText
+        NextTriggerText = NextTriggerText,
+        ScheduleMode = ScheduleMode,
+        SkipOnHoliday = SkipOnHoliday,
+        PauseUntilDate = PauseUntilDate,
+        HealthIssue = HealthIssue
     };
 
     public void UpdateFrom(TaskDefinition source)
@@ -213,10 +366,16 @@ public sealed class TaskDefinition : INotifyPropertyChanged
         StartTime = source.StartTime;
         EndDay = source.EndDay;
         EndTime = source.EndTime;
+        StartDate = source.StartDate;
+        EndDate = source.EndDate;
+        RecurrenceMode = source.RecurrenceMode;
         Priority = source.Priority;
         IsEnabled = source.IsEnabled;
         FadeInMs = source.FadeInMs;
         FadeOutMs = source.FadeOutMs;
+        ScheduleMode = source.ScheduleMode;
+        SkipOnHoliday = source.SkipOnHoliday;
+        PauseUntilDate = source.PauseUntilDate;
     }
 
     private static string ToShortDay(DayOfWeek day) => day switch

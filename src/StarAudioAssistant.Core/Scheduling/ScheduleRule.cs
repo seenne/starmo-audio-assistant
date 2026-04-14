@@ -8,4 +8,10 @@ public sealed record ScheduleRule(
     DayOfWeek EndDay,
     TimeOnly EndTime,
     int Priority,
-    bool Enabled = true);
+    bool Enabled = true,
+    TaskRecurrenceMode RecurrenceMode = TaskRecurrenceMode.Weekly,
+    TaskScheduleMode ScheduleMode = TaskScheduleMode.EveryWeek,
+    bool SkipOnHoliday = false,
+    DateOnly? PauseUntilDate = null,
+    DateOnly? StartDate = null,
+    DateOnly? EndDate = null);

@@ -9,6 +9,7 @@ public sealed class SchedulerOrchestrator : IAsyncDisposable
 {
     private readonly Func<IReadOnlyList<TaskDefinition>> _taskProvider;
     private readonly IAudioPlaybackService _playbackService;
+    private readonly Func<DateOnly, bool> _isHoliday;
     private readonly DispatcherTimer _timer;
     private DateTimeOffset _lastTick;
     private ActivePlayback? _activePlayback;
@@ -16,10 +17,14 @@ public sealed class SchedulerOrchestrator : IAsyncDisposable
     private bool _disposed;
     private string? _lastError;
 
-    public SchedulerOrchestrator(Func<IReadOnlyList<TaskDefinition>> taskProvider, IAudioPlaybackService playbackService)
+    public SchedulerOrchestrator(
+        Func<IReadOnlyList<TaskDefinition>> taskProvider,
+        IAudioPlaybackService playbackService,
+        Func<DateOnly, bool>? isHoliday = null)
     {
         _taskProvider = taskProvider;
         _playbackService = playbackService;
+        _isHoliday = isHoliday ?? (_ => false);
         _timer = new DispatcherTimer(DispatcherPriority.Background)
         {
             Interval = TimeSpan.FromSeconds(1)
@@ -51,7 +56,12 @@ public sealed class SchedulerOrchestrator : IAsyncDisposable
 
     public async Task PlayPreviewAsync(TaskDefinition task, CancellationToken cancellationToken = default)
     {
-        await _playbackService.PlayLoopAsync(task.AudioPath, TimeSpan.FromMilliseconds(task.FadeInMs), TimeSpan.FromMilliseconds(task.FadeOutMs), cancellationToken);
+        await _playbackService.PlayLoopAsync(
+            task.AudioPath,
+            TimeSpan.FromMilliseconds(task.FadeInMs),
+            TimeSpan.FromMilliseconds(task.FadeOutMs),
+            cancellationToken);
+
         var start = DateTimeOffset.Now;
         _activePlayback = new ActivePlayback(task.Id, task.Name, start, ScheduleCalculator.GetEndBoundary(task.ToScheduleRule(), start));
         _lastError = null;
@@ -169,15 +179,16 @@ public sealed class SchedulerOrchestrator : IAsyncDisposable
             .ToList();
     }
 
-    private static List<StartEvent> GetStartEvents(IReadOnlyList<TaskDefinition> tasks, DateTimeOffset fromExclusive, DateTimeOffset toInclusive)
+    private List<StartEvent> GetStartEvents(IReadOnlyList<TaskDefinition> tasks, DateTimeOffset fromExclusive, DateTimeOffset toInclusive)
     {
         var results = new List<StartEvent>();
+
         foreach (var task in tasks)
         {
-            var boundary = ScheduleCalculator.GetNextBoundary(task.StartDay, task.StartTime, fromExclusive.AddTicks(1));
-            if (boundary <= toInclusive)
+            var next = ScheduleCalculator.GetNextStart(task.ToScheduleRule(), fromExclusive.AddTicks(1), _isHoliday);
+            if (next is not null && next <= toInclusive)
             {
-                results.Add(new StartEvent(task, boundary));
+                results.Add(new StartEvent(task, next.Value));
             }
         }
 
@@ -190,7 +201,7 @@ public sealed class SchedulerOrchestrator : IAsyncDisposable
             .Select(task => new
             {
                 Task = task,
-                Next = ScheduleCalculator.GetNextStart(task.ToScheduleRule(), now)
+                Next = ScheduleCalculator.GetNextStart(task.ToScheduleRule(), now, _isHoliday)
             })
             .Where(entry => entry.Next is not null)
             .OrderBy(entry => entry.Next)
@@ -203,15 +214,18 @@ public sealed class SchedulerOrchestrator : IAsyncDisposable
             : $"{nextTrigger.Next:ddd HH:mm} {nextTrigger.Task.Name}";
 
         var conflictHint = BuildConflictHint(now, enabledTasks);
+        var schedulerStatus = string.IsNullOrWhiteSpace(_lastError)
+            ? (_timer.IsEnabled ? "运行中" : "已暂停")
+            : $"异常：{_lastError}";
 
         SnapshotUpdated?.Invoke(new SchedulerSnapshot(
             CurrentTaskId: _activePlayback?.TaskId,
             CurrentTrackName: _activePlayback?.TaskName ?? "无",
             NextTrigger: nextTriggerText,
-            SchedulerStatus: string.IsNullOrWhiteSpace(_lastError)
-                ? (_timer.IsEnabled ? "运行中" : "已暂停")
-                : $"异常：{_lastError}",
-            ConflictHint: conflictHint));
+            SchedulerStatus: schedulerStatus,
+            ConflictHint: conflictHint,
+            LastError: _lastError,
+            SnapshotTime: now));
     }
 
     private string BuildConflictHint(DateTimeOffset now, IReadOnlyList<TaskDefinition> enabledTasks)
@@ -226,7 +240,7 @@ public sealed class SchedulerOrchestrator : IAsyncDisposable
             .Select(task => new
             {
                 Task = task,
-                Next = ScheduleCalculator.GetNextStart(task.ToScheduleRule(), now)
+                Next = ScheduleCalculator.GetNextStart(task.ToScheduleRule(), now, _isHoliday)
             })
             .Where(entry => entry.Next is not null)
             .OrderBy(entry => entry.Next)
@@ -257,4 +271,6 @@ public sealed record SchedulerSnapshot(
     string CurrentTrackName,
     string NextTrigger,
     string SchedulerStatus,
-    string ConflictHint);
+    string ConflictHint,
+    string? LastError,
+    DateTimeOffset SnapshotTime);

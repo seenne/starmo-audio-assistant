@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\StarAudioAssistant.Core\StarAudioAssistant.Core.csproj" />
+    <ProjectReference Include="..\..\src\StarAudioAssistant.Infrastructure\StarAudioAssistant.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

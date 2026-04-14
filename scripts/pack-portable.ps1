@@ -67,7 +67,27 @@ if (Test-Path $zipPath) {
 }
 
 Write-Host "Creating zip package..."
-Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath -Force
+$archiveSucceeded = $false
+$maxAttempts = 8
+for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+    try {
+        Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath -Force
+        $archiveSucceeded = $true
+        break
+    }
+    catch {
+        if ($attempt -ge $maxAttempts) {
+            throw
+        }
+
+        Write-Host "Archive attempt $attempt failed (file lock). Retrying..."
+        Start-Sleep -Milliseconds 700
+    }
+}
+
+if (-not $archiveSucceeded) {
+    throw "Failed to create package archive after $maxAttempts attempts."
+}
 
 Write-Host "Package created: $zipPath"
 Write-Output $zipPath

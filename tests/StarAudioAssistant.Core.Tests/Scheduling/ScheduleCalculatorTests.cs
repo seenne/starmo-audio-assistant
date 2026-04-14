@@ -68,6 +68,58 @@ public class ScheduleCalculatorTests
     }
 
     [Fact]
+    public void GetNextStart_SkipsWeekend_WhenWeekdayModeEnabled()
+    {
+        var rule = CreateRule(DayOfWeek.Saturday, new TimeOnly(10, 0)) with
+        {
+            ScheduleMode = TaskScheduleMode.WeekdaysOnly
+        };
+
+        var next = ScheduleCalculator.GetNextStart(rule, At(2026, 4, 13, 5, 30));
+
+        Assert.Null(next);
+    }
+
+    [Fact]
+    public void GetNextStart_SkipsHoliday_WhenSkipHolidayEnabled()
+    {
+        var rule = CreateRule(DayOfWeek.Monday, new TimeOnly(10, 0)) with
+        {
+            SkipOnHoliday = true
+        };
+
+        var holidayDate = new DateOnly(2026, 4, 13);
+        var next = ScheduleCalculator.GetNextStart(rule, At(2026, 4, 13, 9, 0), day => day == holidayDate);
+
+        Assert.Equal(At(2026, 4, 20, 10, 0), next);
+    }
+
+    [Fact]
+    public void GetNextStart_SkipsUntilPauseDate()
+    {
+        var rule = CreateRule(DayOfWeek.Monday, new TimeOnly(10, 0)) with
+        {
+            PauseUntilDate = new DateOnly(2026, 4, 20)
+        };
+
+        var next = ScheduleCalculator.GetNextStart(rule, At(2026, 4, 13, 9, 0));
+
+        Assert.Equal(At(2026, 4, 27, 10, 0), next);
+    }
+
+    [Fact]
+    public void GetUpcomingStarts_ReturnsNextSevenStarts()
+    {
+        var rule = CreateRule(DayOfWeek.Monday, new TimeOnly(6, 0));
+
+        var starts = ScheduleCalculator.GetUpcomingStarts(rule, At(2026, 4, 13, 5, 30), 7);
+
+        Assert.Equal(7, starts.Count);
+        Assert.Equal(At(2026, 4, 13, 6, 0), starts[0]);
+        Assert.Equal(At(2026, 5, 25, 6, 0), starts[6]);
+    }
+
+    [Fact]
     public void GetEndBoundary_ReturnsSameDayEnd_WhenEndAfterStart()
     {
         var rule = new ScheduleRule(
@@ -105,6 +157,76 @@ public class ScheduleCalculatorTests
         var end = ScheduleCalculator.GetEndBoundary(rule, start);
 
         Assert.Equal(At(2026, 4, 15, 5, 0), end);
+    }
+
+    [Fact]
+    public void GetNextStart_OneTimeFuture_ReturnsSelectedDateTime()
+    {
+        var rule = CreateRule(DayOfWeek.Monday, new TimeOnly(6, 0)) with
+        {
+            RecurrenceMode = TaskRecurrenceMode.OneTime,
+            StartDate = new DateOnly(2026, 4, 15),
+            EndDate = new DateOnly(2026, 4, 15),
+            StartTime = new TimeOnly(9, 30),
+            EndTime = new TimeOnly(11, 0)
+        };
+
+        var next = ScheduleCalculator.GetNextStart(rule, At(2026, 4, 13, 5, 30));
+
+        Assert.Equal(At(2026, 4, 15, 9, 30), next);
+    }
+
+    [Fact]
+    public void GetNextStart_OneTimePast_ReturnsNull()
+    {
+        var rule = CreateRule(DayOfWeek.Monday, new TimeOnly(6, 0)) with
+        {
+            RecurrenceMode = TaskRecurrenceMode.OneTime,
+            StartDate = new DateOnly(2026, 4, 10),
+            EndDate = new DateOnly(2026, 4, 10),
+            StartTime = new TimeOnly(9, 30),
+            EndTime = new TimeOnly(11, 0)
+        };
+
+        var next = ScheduleCalculator.GetNextStart(rule, At(2026, 4, 13, 5, 30));
+
+        Assert.Null(next);
+    }
+
+    [Fact]
+    public void GetUpcomingStarts_OneTime_ReturnsAtMostOneStart()
+    {
+        var rule = CreateRule(DayOfWeek.Monday, new TimeOnly(6, 0)) with
+        {
+            RecurrenceMode = TaskRecurrenceMode.OneTime,
+            StartDate = new DateOnly(2026, 4, 15),
+            EndDate = new DateOnly(2026, 4, 15),
+            StartTime = new TimeOnly(9, 30),
+            EndTime = new TimeOnly(11, 0)
+        };
+
+        var starts = ScheduleCalculator.GetUpcomingStarts(rule, At(2026, 4, 13, 5, 30), 7);
+
+        Assert.Single(starts);
+        Assert.Equal(At(2026, 4, 15, 9, 30), starts[0]);
+    }
+
+    [Fact]
+    public void GetEndBoundary_OneTime_ReturnsSelectedEndDateTime()
+    {
+        var rule = CreateRule(DayOfWeek.Monday, new TimeOnly(6, 0)) with
+        {
+            RecurrenceMode = TaskRecurrenceMode.OneTime,
+            StartDate = new DateOnly(2026, 4, 15),
+            EndDate = new DateOnly(2026, 4, 15),
+            StartTime = new TimeOnly(9, 30),
+            EndTime = new TimeOnly(11, 45)
+        };
+
+        var start = At(2026, 4, 15, 9, 30);
+        var end = ScheduleCalculator.GetEndBoundary(rule, start);
+
+        Assert.Equal(At(2026, 4, 15, 11, 45), end);
     }
 
     [Fact]

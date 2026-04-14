@@ -5,47 +5,46 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="星辰音频助手"
-        Width="1280"
-        Height="820"
-        MinWidth="1120"
-        MinHeight="680"
-        Background="#EEF5FF"
+        Width="1360"
+        Height="860"
+        MinWidth="1200"
+        MinHeight="720"
+        Background="#EEF4FB"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Closing="Window_Closing">
     <Window.Resources>
         <LinearGradientBrush x:Key="PageBg" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Offset="0" Color="#F4F8FF"/>
-            <GradientStop Offset="1" Color="#EAF2FF"/>
+            <GradientStop Offset="0" Color="#F6FAFF"/>
+            <GradientStop Offset="1" Color="#EBF2FC"/>
         </LinearGradientBrush>
 
-        <Style x:Key="ToolbarButtonStyle" TargetType="Button">
-            <Setter Property="Padding" Value="14,7" />
-            <Setter Property="Margin" Value="0,0,10,8" />
-            <Setter Property="BorderBrush" Value="#C7D5E8" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="Foreground" Value="#2F4362" />
-            <Setter Property="BorderThickness" Value="1" />
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="Margin" Value="0,0,10,8"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#C7D5E8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#2D4363"/>
             <Setter Property="FontSize" Value="13"/>
         </Style>
 
         <Style TargetType="DataGridColumnHeader">
-            <Setter Property="Background" Value="#F2F7FF" />
-            <Setter Property="Foreground" Value="#234066" />
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Height" Value="40" />
-            <Setter Property="BorderBrush" Value="#D7E0EC" />
+            <Setter Property="Background" Value="#F4F8FF"/>
+            <Setter Property="Foreground" Value="#1F3A60"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="BorderBrush" Value="#D7E0EC"/>
         </Style>
 
         <Style TargetType="DataGridRow">
-            <Setter Property="Height" Value="38" />
-            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Height" Value="40"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#F5FAFF"/>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#E6EFFF"/>
+                    <Setter Property="Background" Value="#E7F0FF"/>
                     <Setter Property="Foreground" Value="#0F2F57"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
                 </Trigger>
@@ -54,110 +53,198 @@
     </Window.Resources>
 
     <Grid Background="{StaticResource PageBg}">
-        <Border Margin="18" CornerRadius="14" BorderBrush="#D5E1F1" BorderThickness="1" Background="White" Padding="18">
+        <Border Margin="18" Padding="18" Background="White" BorderBrush="#D5E1F1" BorderThickness="1" CornerRadius="14">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="64" />
-                    <RowDefinition Height="64" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="52" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="44" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid Grid.Row="0">
+                <Grid Grid.Row="0" Margin="0,0,0,14">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
+
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="12" Height="12" Fill="#1F4E94" Margin="0,0,10,0" />
-                        <TextBlock Text="星辰音频助手" FontSize="24" FontWeight="SemiBold" Foreground="#1B3761" />
+                        <Ellipse Width="12" Height="12" Fill="#2A5CA9" Margin="0,0,10,0"/>
+                        <TextBlock Text="星辰音频助手" FontSize="26" FontWeight="SemiBold" Foreground="#183760"/>
                     </StackPanel>
+
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Content="最小化到托盘" Padding="14,6" Margin="0,0,8,0" Click="MinimizeToTrayButton_Click" />
-                        <Button Content="关闭" Padding="16,6" Click="CloseButton_Click" />
+                        <Button x:Name="ManageHolidayButton" Style="{StaticResource ActionButtonStyle}" Content="节假日设置" Click="ManageHolidayButton_Click"/>
+                        <Button x:Name="HeaderOpenErrorCenterButton" Style="{StaticResource ActionButtonStyle}" Content="错误中心" Click="OpenErrorCenterButton_Click"/>
+                        <Button x:Name="MinimizeToTrayButton" Style="{StaticResource ActionButtonStyle}" Content="最小化到托盘" Click="MinimizeToTrayButton_Click"/>
+                        <Button x:Name="CloseToTrayButton" Style="{StaticResource ActionButtonStyle}" Content="关闭" Margin="0,0,0,8" Click="CloseButton_Click"/>
                     </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="1" Margin="0,0,0,14">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="定时任务"
-                               VerticalAlignment="Center"
-                               FontSize="27"
-                               FontWeight="SemiBold"
-                               Foreground="#16345F" />
-                    <TextBlock Grid.Column="1"
-                               VerticalAlignment="Center"
-                               Foreground="#5F7188"
-                               FontSize="13"
-                               Text="策略：新任务到点立即切换；错过开始点则跳过" />
+
+                    <Border Grid.Column="0" Background="#EDF6FF" BorderBrush="#CFE1F4" BorderThickness="1" CornerRadius="10" Padding="12,10" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="启用任务" Foreground="#3E5D82"/>
+                            <TextBlock x:Name="EnabledCountText" Text="0" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="#1F3F6C"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Background="#EDF9F2" BorderBrush="#CCE8D6" BorderThickness="1" CornerRadius="10" Padding="12,10" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="当前播放" Foreground="#3E5D82"/>
+                            <TextBlock x:Name="PlayingCountText" Text="0" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="#1F3F6C"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Background="#FFF4F2" BorderBrush="#F2D0CB" BorderThickness="1" CornerRadius="10" Padding="12,10">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="健康异常" Foreground="#3E5D82"/>
+                            <TextBlock x:Name="IssueCountText" Text="0" Margin="10,0,0,0" FontWeight="SemiBold" Foreground="#9B2C20"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
 
-                <WrapPanel Grid.Row="2" Margin="0,4,0,4">
-                    <Button Style="{StaticResource ToolbarButtonStyle}" Background="#1F4E94" Foreground="White" BorderBrush="#1F4E94" Content="新增任务" Click="AddTaskButton_Click" />
-                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="编辑任务" Click="EditTaskButton_Click" />
-                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="删除任务" Click="DeleteTaskButton_Click" />
-                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="启用/停用" Click="ToggleTaskButton_Click" />
-                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="测试播放" Click="TestPlaybackButton_Click" />
-                    <Button Style="{StaticResource ToolbarButtonStyle}" Content="停止播放" Click="StopPlaybackButton_Click" />
-                </WrapPanel>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2.15*"/>
+                        <ColumnDefinition Width="1.2*"/>
+                    </Grid.ColumnDefinitions>
 
-                <Border Grid.Row="3" Margin="0,8,0,12" BorderBrush="#FFD9B0" BorderThickness="1" Background="#FFF6EC" CornerRadius="8" Padding="12,8">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock x:Name="ConflictHintText"
-                                   VerticalAlignment="Center"
-                                   Foreground="#7A3F00"
-                                   FontSize="13"
-                                   Text="当前暂无冲突。" />
-                        <Button Grid.Column="1" Content="查看冲突详情" Padding="12,5" Margin="10,0,0,0" Click="ViewConflictButton_Click" />
+                    <Grid Grid.Column="0" Margin="0,0,14,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <WrapPanel Grid.Row="0" Margin="0,0,0,4">
+                            <Button x:Name="AddTaskButton" Style="{StaticResource ActionButtonStyle}" Background="#1F4E94" Foreground="White" BorderBrush="#1F4E94" Content="新增任务" Click="AddTaskButton_Click"/>
+                            <Button x:Name="EditTaskButton" Style="{StaticResource ActionButtonStyle}" Content="编辑任务" IsEnabled="False" Click="EditTaskButton_Click"/>
+                            <Button x:Name="DeleteTaskButton" Style="{StaticResource ActionButtonStyle}" Content="删除任务" IsEnabled="False" Click="DeleteTaskButton_Click"/>
+                            <Button x:Name="ToggleTaskButton" Style="{StaticResource ActionButtonStyle}" Content="启用/停用" IsEnabled="False" Click="ToggleTaskButton_Click"/>
+                            <Button x:Name="TestPlaybackButton" Style="{StaticResource ActionButtonStyle}" Content="测试播放" IsEnabled="False" Click="TestPlaybackButton_Click"/>
+                            <Button x:Name="StopPlaybackButton" Style="{StaticResource ActionButtonStyle}" Content="停止播放" Margin="0,0,0,8" IsEnabled="False" Click="StopPlaybackButton_Click"/>
+                        </WrapPanel>
+
+                        <Grid Grid.Row="1" Margin="0,4,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock VerticalAlignment="Center" Text="快速筛选" Foreground="#3F5A7D"/>
+                            <ComboBox Grid.Column="1" x:Name="QuickFilterComboBox" Margin="10,0,0,0" Height="30" SelectionChanged="QuickFilterComboBox_SelectionChanged"/>
+
+                            <CheckBox Grid.Column="3" x:Name="ToggleStrategyColumn" Content="策略列" Margin="0,0,10,0" VerticalAlignment="Center" Checked="ColumnToggleChanged" Unchecked="ColumnToggleChanged"/>
+                            <CheckBox Grid.Column="4" x:Name="ToggleNextColumn" Content="下次触发列" Margin="0,0,10,0" VerticalAlignment="Center" Checked="ColumnToggleChanged" Unchecked="ColumnToggleChanged"/>
+                            <CheckBox Grid.Column="5" x:Name="ToggleHealthColumn" Content="健康列" VerticalAlignment="Center" Checked="ColumnToggleChanged" Unchecked="ColumnToggleChanged"/>
+                        </Grid>
+
+                        <DataGrid Grid.Row="2"
+                                  x:Name="TaskGrid"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  IsReadOnly="True"
+                                  HeadersVisibility="Column"
+                                  GridLinesVisibility="Horizontal"
+                                  SelectionMode="Single"
+                                  SelectionUnit="FullRow"
+                                  RowHeaderWidth="0"
+                                  AlternationCount="2"
+                                  RowBackground="White"
+                                  AlternatingRowBackground="#FAFCFF"
+                                  BorderBrush="#D7E0EC"
+                                  BorderThickness="1"
+                                  EnableRowVirtualization="True"
+                                  EnableColumnVirtualization="True"
+                                  VirtualizingPanel.IsVirtualizing="True"
+                                  VirtualizingPanel.VirtualizationMode="Recycling"
+                                  ScrollViewer.CanContentScroll="True"
+                                  SelectionChanged="TaskGrid_SelectionChanged"
+                                  MouseDoubleClick="TaskGrid_MouseDoubleClick">
+                            <DataGrid.Columns>
+                                <DataGridCheckBoxColumn x:Name="EnabledColumn" Header="启用" Binding="{Binding IsEnabled}" Width="66"/>
+                                <DataGridTextColumn x:Name="NameColumn" Header="任务名" Binding="{Binding Name}" Width="1.2*"/>
+                                <DataGridTextColumn x:Name="TimeColumn" Header="时间段" Binding="{Binding TimeRange}" Width="1.45*"/>
+                                <DataGridTextColumn x:Name="StrategyColumn" Header="策略" Binding="{Binding StrategyText}" Width="1.25*"/>
+                                <DataGridTextColumn x:Name="AudioColumn" Header="音频文件" Binding="{Binding AudioFileName}" Width="1.35*"/>
+                                <DataGridTextColumn x:Name="PriorityColumn" Header="优先级" Binding="{Binding Priority}" Width="80"/>
+                                <DataGridTextColumn x:Name="StatusColumn" Header="状态" Binding="{Binding RuntimeStatus}" Width="96"/>
+                                <DataGridTextColumn x:Name="NextColumn" Header="下一次触发" Binding="{Binding NextTriggerText}" Width="150"/>
+                                <DataGridTextColumn x:Name="HealthColumn" Header="健康" Binding="{Binding HealthIssue}" Width="130"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Grid>
-                </Border>
 
-                <DataGrid Grid.Row="4"
-                          x:Name="TaskGrid"
-                          AutoGenerateColumns="False"
-                          CanUserAddRows="False"
-                          IsReadOnly="True"
-                          HeadersVisibility="Column"
-                          GridLinesVisibility="Horizontal"
-                          SelectionMode="Single"
-                          SelectionUnit="FullRow"
-                          RowHeaderWidth="0"
-                          AlternationCount="2"
-                          RowBackground="White"
-                          AlternatingRowBackground="#FAFCFF"
-                          BorderBrush="#D7E0EC"
-                          BorderThickness="1"
-                          MouseDoubleClick="TaskGrid_MouseDoubleClick">
-                    <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Header="启用" Binding="{Binding IsEnabled}" Width="68" />
-                        <DataGridTextColumn Header="任务名" Binding="{Binding Name}" Width="1.1*" />
-                        <DataGridTextColumn Header="时间段" Binding="{Binding TimeRange}" Width="1.55*" />
-                        <DataGridTextColumn Header="音频文件" Binding="{Binding AudioFileName}" Width="1.5*" />
-                        <DataGridTextColumn Header="优先级" Binding="{Binding Priority}" Width="88" />
-                        <DataGridTextColumn Header="状态" Binding="{Binding RuntimeStatus}" Width="110" />
-                        <DataGridTextColumn Header="下一次触发" Binding="{Binding NextTriggerText}" Width="170" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                    <Border Grid.Column="1" BorderBrush="#D7E0EC" BorderThickness="1" CornerRadius="12" Background="#FAFCFF" Padding="14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                <Border Grid.Row="5" BorderBrush="#D7E0EC" BorderThickness="0,1,0,0" Background="#F4F8FF" Margin="0,12,0,0">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
-                        <TextBlock Foreground="#435974" FontSize="12" Text="当前播放：" />
-                        <TextBlock x:Name="CurrentPlaybackText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="无" />
-                        <TextBlock Margin="14,0" Foreground="#BCCADE" Text="|" />
-                        <TextBlock Foreground="#435974" FontSize="12" Text="下一任务：" />
-                        <TextBlock x:Name="NextTriggerText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="无" />
-                        <TextBlock Margin="14,0" Foreground="#BCCADE" Text="|" />
-                        <TextBlock Foreground="#435974" FontSize="12" Text="调度状态：" />
-                        <TextBlock x:Name="SchedulerStatusText" Foreground="#1F3E6D" FontSize="12" FontWeight="SemiBold" Text="启动中" />
+                            <StackPanel>
+                                <TextBlock Text="任务详情" FontSize="20" FontWeight="SemiBold" Foreground="#17355F"/>
+                                <TextBlock x:Name="SelectedTaskNameText" Margin="0,6,0,0" FontSize="16" FontWeight="SemiBold" Foreground="#1F446F" Text="未选择任务"/>
+                            </StackPanel>
+
+                            <Border Grid.Row="1" Margin="0,12,0,12" Background="White" BorderBrush="#D7E0EC" BorderThickness="1" CornerRadius="10" Padding="10">
+                                <StackPanel>
+                                    <TextBlock x:Name="SelectedTaskTimeText" Foreground="#325173" Text="时间段：--"/>
+                                    <TextBlock x:Name="SelectedTaskStrategyText" Margin="0,4,0,0" Foreground="#325173" Text="策略：--"/>
+                                    <TextBlock x:Name="SelectedTaskAudioText" Margin="0,4,0,0" Foreground="#325173" Text="文件：--" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="SelectedTaskPriorityText" Margin="0,4,0,0" Foreground="#325173" Text="优先级：--"/>
+                                    <TextBlock x:Name="SelectedTaskFadeText" Margin="0,4,0,0" Foreground="#325173" Text="淡入/淡出：--"/>
+                                    <TextBlock x:Name="SelectedTaskRuntimeText" Margin="0,4,0,0" Foreground="#325173" Text="状态：--"/>
+                                    <TextBlock x:Name="SelectedTaskHealthText" Margin="0,4,0,0" Foreground="#A6342A" Text="健康：--" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Grid.Row="2" Background="#FFF6EC" BorderBrush="#FFD8AE" BorderThickness="1" CornerRadius="8" Padding="10" Margin="0,0,0,10">
+                                <TextBlock x:Name="ConflictHintText" Foreground="#7A3F00" Text="当前暂无冲突。" TextWrapping="Wrap"/>
+                            </Border>
+
+                            <Grid Grid.Row="3">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="未来 7 次触发预览" Foreground="#33567D" FontWeight="SemiBold"/>
+                                <ListBox Grid.Row="1" x:Name="SelectedTaskPreviewList" Margin="0,8,0,8" BorderBrush="#D7E0EC" BorderThickness="1" Background="White"/>
+
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button x:Name="RefreshPreviewButton" Style="{StaticResource ActionButtonStyle}" Margin="0,0,8,0" Content="刷新预览" IsEnabled="False" Click="RefreshPreviewButton_Click"/>
+                                    <Button x:Name="PanelOpenErrorCenterButton" Style="{StaticResource ActionButtonStyle}" Margin="0" Content="打开错误中心" Click="OpenErrorCenterButton_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <Border Grid.Row="3" Margin="0,14,0,0" BorderBrush="#D7E0EC" BorderThickness="0,1,0,0" Background="#F4F8FF" Padding="12,10">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Foreground="#425A78" Text="当前播放："/>
+                        <TextBlock x:Name="CurrentPlaybackText" Foreground="#1F3E6D" FontWeight="SemiBold" Text="无"/>
+                        <TextBlock Foreground="#BFCBDD" Margin="12,0" Text="|"/>
+                        <TextBlock Foreground="#425A78" Text="下一任务："/>
+                        <TextBlock x:Name="NextTriggerText" Foreground="#1F3E6D" FontWeight="SemiBold" Text="无"/>
+                        <TextBlock Foreground="#BFCBDD" Margin="12,0" Text="|"/>
+                        <TextBlock Foreground="#425A78" Text="调度状态："/>
+                        <TextBlock x:Name="SchedulerStatusText" Foreground="#1F3E6D" FontWeight="SemiBold" Text="启动中"/>
                     </StackPanel>
                 </Border>
             </Grid>

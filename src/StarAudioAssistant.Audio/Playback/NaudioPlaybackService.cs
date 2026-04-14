@@ -6,6 +6,7 @@ namespace StarAudioAssistant.Audio.Playback;
 public sealed class NaudioPlaybackService : IAudioPlaybackService
 {
     private readonly SemaphoreSlim _gate = new(1, 1);
+    private readonly Dictionary<string, float> _normalizationCache = new(StringComparer.OrdinalIgnoreCase);
     private TrackContext? _current;
     private bool _disposed;
 
@@ -33,10 +34,11 @@ public sealed class NaudioPlaybackService : IAudioPlaybackService
                 _current = null;
             }
 
-            var next = CreateTrack(audioPath);
+            var targetVolume = GetNormalizedTargetVolume(audioPath);
+            var next = CreateTrack(audioPath, targetVolume);
             next.VolumeChannel.Volume = 0f;
             next.Output.Play();
-            await FadeVolumeAsync(next.VolumeChannel, 0f, 1f, fadeIn, cancellationToken);
+            await FadeVolumeAsync(next.VolumeChannel, 0f, next.TargetVolume, fadeIn, cancellationToken);
             _current = next;
         }
         finally
@@ -89,7 +91,72 @@ public sealed class NaudioPlaybackService : IAudioPlaybackService
         }
     }
 
-    private static TrackContext CreateTrack(string audioPath)
+    private float GetNormalizedTargetVolume(string audioPath)
+    {
+        if (_normalizationCache.TryGetValue(audioPath, out var cached))
+        {
+            return cached;
+        }
+
+        var estimated = EstimateTargetVolume(audioPath);
+        _normalizationCache[audioPath] = estimated;
+        return estimated;
+    }
+
+    private static float EstimateTargetVolume(string audioPath)
+    {
+        try
+        {
+            using var reader = new AudioFileReader(audioPath);
+            var sampleProvider = reader.ToSampleProvider();
+
+            var channels = Math.Max(1, sampleProvider.WaveFormat.Channels);
+            var maxSamples = sampleProvider.WaveFormat.SampleRate * channels * 12;
+            var buffer = new float[4096];
+
+            double sumSquares = 0;
+            var sampleCount = 0;
+
+            while (sampleCount < maxSamples)
+            {
+                var request = Math.Min(buffer.Length, maxSamples - sampleCount);
+                var read = sampleProvider.Read(buffer, 0, request);
+                if (read <= 0)
+                {
+                    break;
+                }
+
+                for (var i = 0; i < read; i++)
+                {
+                    var sample = buffer[i];
+                    sumSquares += sample * sample;
+                }
+
+                sampleCount += read;
+            }
+
+            if (sampleCount <= 0)
+            {
+                return 1f;
+            }
+
+            var rms = Math.Sqrt(sumSquares / sampleCount);
+            if (rms < 0.0005)
+            {
+                return 1f;
+            }
+
+            const double targetRms = 0.12;
+            var gain = targetRms / rms;
+            return (float)Math.Clamp(gain, 0.55, 1.45);
+        }
+        catch
+        {
+            return 1f;
+        }
+    }
+
+    private static TrackContext CreateTrack(string audioPath, float targetVolume)
     {
         if (!File.Exists(audioPath))
         {
@@ -109,7 +176,7 @@ public sealed class NaudioPlaybackService : IAudioPlaybackService
         var output = new WasapiOut(endpoint, AudioClientShareMode.Shared, true, 100);
         output.Init(volume);
 
-        return new TrackContext(audioPath, output, volume, endpoint, enumerator);
+        return new TrackContext(audioPath, output, volume, endpoint, enumerator, targetVolume);
     }
 
     private static async Task FadeOutAndDisposeAsync(TrackContext context, TimeSpan fadeOut, CancellationToken cancellationToken)
@@ -152,13 +219,15 @@ public sealed class NaudioPlaybackService : IAudioPlaybackService
             WasapiOut output,
             WaveChannel32 volumeChannel,
             MMDevice endpoint,
-            MMDeviceEnumerator enumerator)
+            MMDeviceEnumerator enumerator,
+            float targetVolume)
         {
             TrackPath = trackPath;
             Output = output;
             VolumeChannel = volumeChannel;
             Endpoint = endpoint;
             Enumerator = enumerator;
+            TargetVolume = targetVolume;
         }
 
         public string TrackPath { get; }
@@ -170,6 +239,8 @@ public sealed class NaudioPlaybackService : IAudioPlaybackService
         public MMDevice Endpoint { get; }
 
         public MMDeviceEnumerator Enumerator { get; }
+
+        public float TargetVolume { get; }
 
         public void Dispose()
         {

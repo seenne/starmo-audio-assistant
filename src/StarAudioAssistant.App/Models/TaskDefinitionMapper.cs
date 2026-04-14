@@ -1,4 +1,5 @@
-﻿using StarAudioAssistant.Infrastructure.Configuration;
+﻿using StarAudioAssistant.Core.Scheduling;
+using StarAudioAssistant.Infrastructure.Configuration;
 
 namespace StarAudioAssistant.App.Models;
 
@@ -17,17 +18,23 @@ public static class TaskDefinitionMapper
                 StartTime = task.StartTime,
                 EndDay = task.EndDay,
                 EndTime = task.EndTime,
+                StartDate = task.StartDate,
+                EndDate = task.EndDate,
                 Priority = task.Priority,
                 IsEnabled = task.Enabled,
                 FadeInMs = task.FadeInMs,
                 FadeOutMs = task.FadeOutMs,
                 SortOrder = task.SortOrder,
+                RecurrenceMode = ParseRecurrence(task.RecurrenceMode),
+                ScheduleMode = ParseMode(task.ScheduleMode),
+                SkipOnHoliday = task.SkipOnHoliday,
+                PauseUntilDate = task.PauseUntilDate,
                 RuntimeStatus = task.Enabled ? "等待中" : "已停用"
             })
             .ToList();
     }
 
-    public static AppConfiguration ToConfiguration(IEnumerable<TaskDefinition> tasks)
+    public static AppConfiguration ToConfiguration(IEnumerable<TaskDefinition> tasks, IReadOnlyList<DateOnly>? holidayDates = null, UiConfiguration? ui = null)
     {
         return new AppConfiguration
         {
@@ -42,13 +49,41 @@ public static class TaskDefinitionMapper
                     StartTime = task.StartTime,
                     EndDay = task.EndDay,
                     EndTime = task.EndTime,
+                    StartDate = task.StartDate,
+                    EndDate = task.EndDate,
                     Priority = task.Priority,
                     Enabled = task.IsEnabled,
                     FadeInMs = task.FadeInMs,
                     FadeOutMs = task.FadeOutMs,
-                    SortOrder = task.SortOrder
+                    SortOrder = task.SortOrder,
+                    RecurrenceMode = task.RecurrenceMode.ToString(),
+                    ScheduleMode = task.ScheduleMode.ToString(),
+                    SkipOnHoliday = task.SkipOnHoliday,
+                    PauseUntilDate = task.PauseUntilDate
                 })
-                .ToList()
+                .ToList(),
+            HolidayDates = holidayDates?.ToList() ?? [],
+            Ui = ui ?? new UiConfiguration()
         };
+    }
+
+    private static TaskScheduleMode ParseMode(string? raw)
+    {
+        if (Enum.TryParse<TaskScheduleMode>(raw, ignoreCase: true, out var mode))
+        {
+            return mode;
+        }
+
+        return TaskScheduleMode.EveryWeek;
+    }
+
+    private static TaskRecurrenceMode ParseRecurrence(string? raw)
+    {
+        if (Enum.TryParse<TaskRecurrenceMode>(raw, ignoreCase: true, out var mode))
+        {
+            return mode;
+        }
+
+        return TaskRecurrenceMode.Weekly;
     }
 }
