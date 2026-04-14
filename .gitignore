@@ -2,6 +2,7 @@
 bin/
 obj/
 out/
+dist/
 
 # Local SDK/cache
 .dotnet/
@@ -22,3 +23,6 @@ Thumbs.db
 
 # Optional artifacts
 *.nupkg
+
+# Local temporary debug scripts
+scripts/_*.ps1

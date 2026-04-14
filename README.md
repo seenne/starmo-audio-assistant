@@ -25,3 +25,32 @@ $dotnet = '.\\.dotnet\\dotnet.exe'
 - Missed start boundaries are skipped (no catch-up playback).
 - System audio API playback (no external player process dependency).
 - Fade-out/fade-in transitions.
+
+## What Is Implemented In MVP
+- WPF main window with task table, toolbar actions, conflict hint, and runtime status bar.
+- Task add/edit dialog with file picker and field validation.
+- Tray behavior: minimize-to-tray, restore on double-click, tray menu stop playback/exit.
+- JSON config persistence with auto-load/save.
+- Scheduler loop with:
+  - weekly/cross-day start and end boundaries
+  - immediate preemption on start conflict
+  - skip missed starts after long sleep/wake gaps
+- NAudio-based MP3 looping playback with fade-out/fade-in.
+
+## Runtime Notes
+- Config file location: `%AppData%\\StarAudioAssistant\\config.json`
+- Lock-screen playback is supported while the same user session remains active.
+- If configured audio paths do not exist, scheduler status will show an error until paths are fixed.
+
+## Portable Packaging
+Every package run generates a brand-new timestamped zip file.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\pack-portable.ps1
+```
+
+Or double-click:
+- `pack-portable.cmd`
+
+Output folder:
+- `dist\packages\StarAudioAssistant-portable-win-x64-<timestamp>.zip`
