@@ -4,57 +4,74 @@
 
 <p align="center">
   <a href="https://github.com/seenne/starmo-audio-assistant/releases/latest">
-    <img alt="Release" src="https://img.shields.io/github/v/release/seenne/starmo-audio-assistant?label=Release&color=2A5CAA">
+    <img alt="Latest Release" src="https://img.shields.io/github/v/release/seenne/starmo-audio-assistant?label=Release&color=2A5CAA" />
   </a>
   <a href="./LICENSE">
-    <img alt="License" src="https://img.shields.io/badge/License-MIT-1F8B4C">
+    <img alt="License" src="https://img.shields.io/badge/License-MIT-1F8B4C" />
   </a>
-  <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%2010%2F11-0A66C2">
-  <img alt=".NET" src="https://img.shields.io/badge/.NET-8-512BD4">
+  <img alt="Platform" src="https://img.shields.io/badge/Platform-Windows%2010%2F11-0A66C2" />
+  <img alt="Runtime" src="https://img.shields.io/badge/.NET-8-512BD4" />
 </p>
 
-<h1 align="center">Starmo Audio Assistant</h1>
+<h1 align="center">Starmo Audio Assistant · 星晨音频助手</h1>
+
+<p align="center">
+  Production-grade scheduled audio orchestration for Windows.
+</p>
 
 <p align="center">
   <a href="#中文介绍">中文</a> ·
   <a href="#english-overview">English</a> ·
-  <a href="https://github.com/seenne/starmo-audio-assistant/releases/latest">Download</a>
+  <a href="https://github.com/seenne/starmo-audio-assistant/releases/latest">Download</a> ·
+  <a href="#quick-start">Quick Start</a>
 </p>
 
 ## 中文介绍
-`Starmo Audio Assistant`（星晨音频助手）是一款面向 Windows 的轻量级定时音频助手。  
-它支持按周循环或单次时间段触发播放，支持跨天任务、淡入淡出、托盘后台运行，并优先保证“可预期”和“稳定”。
+`Starmo Audio Assistant（星晨音频助手）` 是一款偏工程级稳定性的 Windows 定时音频工具。  
+面向“长期后台运行”的使用场景，强调可靠调度、可诊断、可维护。
 
-### 核心能力
-- 定时策略：每周循环、单次执行、跨天时间段
-- 播放体验：系统音频接口播放（NAudio）、淡入淡出切换
-- 冲突处理：新任务到点可抢占当前播放任务
-- 运行方式：最小化到托盘、双击托盘恢复、后台持续调度
-- 健康检查：音频路径/排程合法性检查与错误中心诊断
-
-### 适用场景
-- 早晚固定语音播报
-- 夜间白噪音/助眠音频轮播
-- 值班提醒、班次提示与时间窗广播
+### 你会得到什么
+- 高可靠定时：每周循环、单次执行、跨天时间窗
+- 专业播放控制：系统音频接口、淡入淡出、任务抢占
+- 后台稳定运行：托盘模式、快速恢复、异常记录
+- 清晰可控界面：任务详情、冲突提示、健康状态可视化
+- 便携交付：免安装压缩包，开箱即用
 
 ## English Overview
-`Starmo Audio Assistant` is a lightweight Windows scheduler for MP3 audio playback.  
-It supports weekly and one-time schedules, cross-day windows, smooth fade transitions, tray-first workflow, and reliability-focused orchestration.
+`Starmo Audio Assistant` is a reliability-first Windows scheduler for audio tasks.  
+It is built for long-running tray workflows where predictable timing and diagnostics matter.
 
-### Key Capabilities
-- Scheduling: weekly recurring and one-time execution with cross-day windows
-- Playback: system audio playback via NAudio with fade in/out
-- Conflict handling: newly triggered tasks can preempt active playback
-- Runtime model: tray background mode with resilient scheduler loop
-- Diagnostics: task health checks and an in-app error center
+### What You Get
+- Robust scheduling: weekly recurring, one-time, and cross-day windows
+- Professional playback: system audio path with fade-in/fade-out and preemption
+- Stable background runtime: tray-first workflow with resilient state handling
+- Operational visibility: conflict hints, task health checks, and error center
+- Portable delivery: no-installer zip package
 
-### Typical Use Cases
-- Morning/evening routine voice playback
-- Night-time white-noise scheduling
-- Shift reminders and timed audio announcements
+## Why It Feels Professional
+| Dimension | Design Choice | Outcome |
+|---|---|---|
+| Reliability | Skip missed triggers after sleep/wake gaps | Avoids unexpected catch-up playback |
+| UX Clarity | Disable irrelevant actions when no row is selected | Fewer invalid operations |
+| Audio Quality | Fade transitions with preemption policy | Smooth handover between tasks |
+| Operability | Error center + diagnostics export | Faster troubleshooting |
+| Distribution | Scripted portable packaging + retries | Repeatable release process |
+
+## Feature Matrix
+| Capability | Status |
+|---|---|
+| Weekly scheduler | Ready |
+| One-time scheduler | Ready |
+| Cross-day time range | Ready |
+| Fade in/out playback | Ready |
+| Task preemption | Ready |
+| Tray mode | Ready |
+| Holiday skip strategy | Ready |
+| Health checks & diagnostics | Ready |
+| UI regression automation | Ready |
 
 ## Quick Start
-Use the bundled local SDK in this repository:
+Use the bundled SDK in this repository:
 
 ```powershell
 $dotnet = '.\\.dotnet\\dotnet.exe'
@@ -65,7 +82,7 @@ $dotnet = '.\\.dotnet\\dotnet.exe'
 ```
 
 ## Portable Package
-Each package build generates a brand-new timestamped zip:
+Generate a brand-new timestamped zip each time:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\pack-portable.ps1
@@ -78,16 +95,30 @@ Output:
 - `dist\packages\StarmoAudioAssistant-portable-win-x64-<timestamp>.zip`
 
 ## Architecture
-- `src/StarAudioAssistant.App`: WPF desktop UI, tray shell, task editor
-- `src/StarAudioAssistant.Core`: schedule rule model and trigger calculator
-- `src/StarAudioAssistant.Audio`: playback abstraction and fade controller
-- `src/StarAudioAssistant.Infrastructure`: JSON config storage and runtime persistence
-- `tests/StarAudioAssistant.Core.Tests`: scheduling and config regression tests
+```mermaid
+flowchart LR
+  UI["WPF App\nTask UI + Tray"] --> Core["Scheduling Core\nRules + Calculator"]
+  UI --> Audio["Audio Layer\nNAudio Playback"]
+  UI --> Infra["Infrastructure\nJSON Config + Persistence"]
+  Core --> UI
+  Audio --> UI
+  Infra --> UI
+```
+
+### Project Layout
+- `src/StarAudioAssistant.App`: desktop shell, task editor, tray integration
+- `src/StarAudioAssistant.Core`: scheduling rules and trigger calculations
+- `src/StarAudioAssistant.Audio`: audio abstraction and fade playback engine
+- `src/StarAudioAssistant.Infrastructure`: config storage and runtime persistence
+- `tests/StarAudioAssistant.Core.Tests`: scheduling/config regression tests
 
 ## Runtime Notes
-- Config path: `%AppData%\\StarmoAudioAssistant\\config.json`
-- Lock-screen playback is supported under the same logged-in Windows session
-- Invalid/missing audio files are surfaced in health checks and error center
+- Config path: `%AppData%\StarmoAudioAssistant\config.json`
+- Supports playback while the same Windows user session stays active
+- Invalid audio paths are surfaced through health checks and error center
+
+## Search Keywords
+`windows audio scheduler`, `wpf audio player`, `mp3 scheduled playback`, `naudio scheduler`, `tray audio assistant`
 
 ## License
 MIT © 2026 Starmo Audio Assistant Contributors
