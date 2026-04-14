@@ -1,0 +1,40 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="64" y1="36" x2="1126" y2="286" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F2F57"/>
+      <stop offset="1" stop-color="#2A5CAA"/>
+    </linearGradient>
+    <linearGradient id="line" x1="168" y1="154" x2="1060" y2="154" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9DC6FF" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#DCEBFF"/>
+      <stop offset="1" stop-color="#9DC6FF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="18" y="18" width="1164" height="284" rx="26" fill="url(#bg)"/>
+  <rect x="18.75" y="18.75" width="1162.5" height="282.5" rx="25.25" stroke="#9DC6FF" stroke-opacity="0.35" stroke-width="1.5"/>
+
+  <circle cx="1028" cy="96" r="72" fill="#FFFFFF" fill-opacity="0.05"/>
+  <circle cx="1054" cy="112" r="42" fill="#FFFFFF" fill-opacity="0.08"/>
+  <circle cx="958" cy="232" r="58" fill="#FFFFFF" fill-opacity="0.04"/>
+
+  <rect x="88" y="94" width="66" height="66" rx="16" fill="#FFFFFF" fill-opacity="0.12"/>
+  <path d="M108 128C108 119.163 115.163 112 124 112H130C138.837 112 146 119.163 146 128V128C146 136.837 138.837 144 130 144H124C115.163 144 108 136.837 108 128V128Z" fill="#EAF3FF"/>
+  <rect x="121" y="106" width="12" height="44" rx="6" fill="#8EC0FF"/>
+
+  <text x="184" y="122" fill="#EAF3FF" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="600">
+    STAR AUDIO ASSISTANT
+  </text>
+  <text x="184" y="168" fill="#FFFFFF" font-family="'Segoe UI', Arial, sans-serif" font-size="42" font-weight="700">
+    Windows Scheduled Audio Orchestrator
+  </text>
+  <text x="184" y="206" fill="#D8E8FF" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="500">
+    Reliable MP3 scheduling · Smooth fade in/out · Tray-first workflow
+  </text>
+
+  <line x1="168" y1="228" x2="1060" y2="228" stroke="url(#line)" stroke-width="1.5"/>
+
+  <text x="184" y="260" fill="#C8DEFF" font-family="'Segoe UI', Arial, sans-serif" font-size="16">
+    Built with .NET 8 + WPF + NAudio
+  </text>
+</svg>
